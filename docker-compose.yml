@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  php:
+#    image: php:8.2-apache
+    build: .
+    container_name: php_symfony
+    user: "1000:1000"
+    volumes:
+      - ./symfony:/var/www/html/symfony
+      - ./vhost.conf:/etc/apache2/sites-available/000-default.conf
+#      - ./php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+      MYSQL_ROOT_PASSWORD: root
+      DATABASE_URL: "mysql://symfony:symfony@db:3306/symfony"
+      TZ: Europe/Warsaw
+    command: >
+      bash -c "
+        if [ ! -d /var/www/html/symfony/vendor ]; then 
+          composer create-project symfony/skeleton /var/www/html/symfony; 
+        fi && 
+        cd /var/www/html/symfony &&
+        composer require symfony/webpack-encore-bundle &&
+        npm install &&
+        npm install -D tailwindcss postcss postcss-loader autoprefixer &&
+        npx tailwindcss init -p &&
+        apache2-foreground
+      "
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_symfony
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+
+volumes:
+  db_data:

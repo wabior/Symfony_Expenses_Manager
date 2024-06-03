@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>{% block title %}My Website{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+            {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+</head>
+
+<body class="bg-gray-100">
+<div class="min-h-screen flex flex-col">
+    <header>
+        {% block menu %}
+            {% include 'menu.html.twig' with {'menu_items': menu_items} %}
+        {% endblock %}
+    </header>
+
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+
+    <footer class="bg-gray-600 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <p>Expense Manager © 2024. All rights reserved.</p>
+                <p>Manage your expenses with ease and efficiency.</p>
+            </div>
+        </div>
+    </footer>
+
+</div>
+</body>
+</html>

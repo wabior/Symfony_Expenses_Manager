@@ -1,0 +1,7 @@
+<nav class="bg-gray-400">
+    <ul class="flex justify-center font-bold">
+        {% for item in menu_items %}
+            <li class="p-4"><a href="{{ path(item.name) }}">{{ item.friendly_name }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
