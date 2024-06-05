@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\ExpensesService;
+use App\Service\ExpenseService;
 use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,10 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ExpensesController extends BaseController
 {
-    private ExpensesService $expensesService;
+    private ExpenseService $expensesService;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(ExpensesService $expensesService, EntityManagerInterface $entityManager)
+    public function __construct(ExpenseService $expensesService, EntityManagerInterface $entityManager)
     {
         $this->expensesService = $expensesService;
         $this->entityManager = $entityManager;

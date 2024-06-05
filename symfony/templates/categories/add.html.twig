@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Category{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto mt-4 xl:w-1/3">
+        <h1 class="text-2xl font-bold text-gray-900 mb-8">Add a new category</h1>
+
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Existing Categories</h2>
+        <ul class="list-disc list-inside mb-8">
+            {% for category in categories %}
+                <li>{{ category.namePolish }} ({{ category.nameEnglish }})</li>
+            {% else %}
+                <li>No categories found.</li>
+            {% endfor %}
+        </ul>
+
+        <form action="{{ path('category_add') }}" method="post" class="space-y-6 bg-white p-8 shadow-xl rounded-lg">
+            <div>
+                <label for="nameEnglish" class="block text-lg font-semibold text-gray-800">Category Name (English):</label>
+                <input type="text" id="nameEnglish" name="nameEnglish" required class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+            </div>
+            <div>
+                <label for="namePolish" class="block text-lg font-semibold text-gray-800">Category Name (Polish):</label>
+                <input type="text" id="namePolish" name="namePolish" required class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+            </div>
+            <div>
+                <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">Add Category</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
