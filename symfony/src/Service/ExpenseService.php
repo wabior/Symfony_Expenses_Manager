@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
 
-class ExpensesService
+class ExpenseService
 {
     private EntityManagerInterface $entityManager;
 

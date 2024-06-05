@@ -5,16 +5,16 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\RenderService;
-use App\Service\ExpensesService;
+use App\Service\ExpenseService;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class RouteController extends BaseController
 {
     private RenderService $renderService;
-    private ExpensesService $expensesService;
+    private ExpenseService $expensesService;
 
-    public function __construct(RouterInterface $router, RenderService $renderService, ExpensesService $expensesService)
+    public function __construct(RouterInterface $router, RenderService $renderService, ExpenseService $expensesService)
     {
         parent::__construct($router);
         $this->renderService = $renderService;
