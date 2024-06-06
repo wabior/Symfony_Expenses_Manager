@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\MenuRepository;
 use App\Service\CategoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,14 +13,12 @@ use Symfony\Component\Routing\RouterInterface;
 class CategoryController extends BaseController
 {
     protected RouterInterface $router;
-    private EntityManagerInterface $entityManager;
     private CategoryService $categoryService;
 
-    public function __construct(RouterInterface $router, EntityManagerInterface $entityManager, CategoryService $categoryService)
+    public function __construct(RouterInterface $router, EntityManagerInterface $entityManager, CategoryService $categoryService, MenuRepository $menuRepository)
     {
-        $this->entityManager = $entityManager;
         $this->categoryService = $categoryService;
-        parent::__construct($router);
+        parent::__construct($router, $menuRepository);
     }
 
     #[Route('/categories', name: 'categories', options: ['friendly_name' => 'Kategorie', 'order' => 3])]

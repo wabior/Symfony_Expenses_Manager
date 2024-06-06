@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Menu;
 use App\Repository\MenuRepository;
-use App\Service\RouteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,13 +11,15 @@ use Symfony\Component\Routing\RouterInterface;
 
 class MenuController extends BaseController
 {
-    private RouteService $routeService;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(RouteService $routeService, EntityManagerInterface $entityManager, RouterInterface $router, MenuRepository $menuRepository)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        RouterInterface $router,
+        MenuRepository $menuRepository
+    )
     {
-        parent::__construct($router);
-        $this->routeService = $routeService;
+        parent::__construct($router, $menuRepository);
         $this->entityManager = $entityManager;
         $this->menuRepository = $menuRepository;
     }
@@ -37,28 +37,6 @@ class MenuController extends BaseController
     #[Route('/admin/menu/save', name: 'admin_menu_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
-//        $activatedRoutes = $request->request->get('activated_routes', []);
-//        $menuRepository = $this->entityManager->getRepository(Menu::class);
-//
-//        // Dezaktywuj wszystkie elementy menu
-//        $allMenuItems = $menuRepository->findAll();
-//        foreach ($allMenuItems as $menuItem) {
-//            $menuItem->setActivated(false);
-//            $this->entityManager->persist($menuItem);
-//        }
-//
-//        // Aktywuj wybrane elementy menu
-//        foreach ($activatedRoutes as $routeName) {
-//            $menuItem = $menuRepository->findOneBy(['routeName' => $routeName]);
-//            if ($menuItem) {
-//                $menuItem->setActivated(true);
-//                $this->entityManager->persist($menuItem);
-//            }
-//        }
-//
-//        $this->entityManager->flush();
-//
-//        return $this->redirectToRoute('admin_menu');
         $data = $request->request->all();
 
         foreach ($this->menuRepository->findAll() as $menu) {
