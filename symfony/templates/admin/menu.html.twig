@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Menu{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto mt-4">
+        <h1 class="text-2xl font-bold text-gray-900 mb-8">Admin Menu</h1>
+
+        <form action="{{ path('admin_menu_save') }}" method="post">
+            <div class="table-container">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                    <tr class="border-t">
+                        <th class="table-header">Route Name</th>
+                        <th class="table-header">Friendly Name</th>
+                        <th class="table-header">Path</th>
+                        <th class="table-header">Order</th>
+                        <th class="table-header">Activate</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in menuItems %}
+                        <tr>
+                            <td class="table-cell">{{ item.routeName }}</td>
+                            <td class="table-cell">{{ item.friendlyName }}</td>
+                            <td class="table-cell">{{ item.path }}</td>
+                            <td class="table-cell">{{ item.order }}</td>
+                            <td class="table-cell">
+                                <input type="hidden" name="menu[{{ item.id }}][activated]" value="0">
+                                <input type="checkbox" name="menu[{{ item.id }}][activated]" value="1" {% if item.activated %}checked{% endif %}>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="table-cell">No menu items found.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">Save</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

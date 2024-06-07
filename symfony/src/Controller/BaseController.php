@@ -5,45 +5,40 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\MenuRepository;
 
 class BaseController extends AbstractController
 {
     protected RouterInterface $router;
+    protected MenuRepository $menuRepository;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, MenuRepository $menuRepository)
     {
         $this->router = $router;
+        $this->menuRepository = $menuRepository;
     }
 
     protected function renderWithRoutes(string $view, array $parameters = [], ?Response $response = null): Response
     {
-        $routeCollection = $this->router->getRouteCollection();
+        // Pobierz elementy menu z bazy danych
+        $menuItems = $this->menuRepository->findBy([], ['order' => 'ASC']);
+
+        // Przekształć elementy menu na format używany w widoku
         $filteredRoutes = [];
 
-        // Pierwsza iteracja: przefiltruj routy z przyjazną nazwą i dodaj je do tablicy
-        foreach ($routeCollection as $routeName => $route) {
-            if ($route->getOption('friendly_name')) {
-                $filteredRoutes[] = [
-                    'name' => $routeName,
-                    'path' => $route->getPath(),
-                    'friendly_name' => $route->getOption('friendly_name'),
-                    'order' => $route->getOption('order') ?? null
-                ];
-            }
+        foreach ($menuItems as $menuItem) {
+            $filteredRoutes[] = [
+                'name' => $menuItem->getFriendlyName(),
+                'path' => $menuItem->getPath(),
+                'friendly_name' => $menuItem->getFriendlyName(),
+                'order' => $menuItem->getOrder(),
+                'activated' => $menuItem->isActivated(),
+            ];
         }
 
-        $routeCount = count($filteredRoutes);
-
-        // Druga iteracja: ustaw odpowiednią wartość 'order' dla rout bez ustawionego 'order'
-        foreach ($filteredRoutes as &$route) {
-            if ($route['order'] === null) {
-                $route['order'] = $routeCount;
-            }
-        }
-
-        // Sortowanie rout na podstawie wartości 'order'
-        usort($filteredRoutes, function ($a, $b) {
-            return $a['order'] <=> $b['order'];
+        // Filtruj tylko aktywne elementy menu
+        $filteredRoutes = array_filter($filteredRoutes, function ($route) {
+            return $route['activated'];
         });
 
         $parameters['menu_items'] = $filteredRoutes;
