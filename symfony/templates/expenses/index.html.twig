@@ -22,6 +22,7 @@
                     <th class="table-header">Date</th>
                     <th class="table-header">Payment Date</th>
                     <th class="table-header">Payment Status</th>
+                    <th class="table-header">Category</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -33,10 +34,11 @@
                         <td class="table-cell">{{ expense.date|date('Y-m-d') }}</td>
                         <td class="table-cell">{{ expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A' }}</td>
                         <td class="table-cell">{{ expense.paymentStatus }}</td>
+                        <td class="table-cell">{{ expense.category.nameEnglish }}</td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="table-cell">No expenses found.</td>
+                        <td colspan="7" class="table-cell">No expenses found.</td>
                     </tr>
                 {% endfor %}
                 </tbody>

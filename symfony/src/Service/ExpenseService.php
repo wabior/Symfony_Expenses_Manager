@@ -23,16 +23,22 @@ class ExpenseService
 
     public function addExpense(Request $request): void
     {
-        $name = $request->request->get('name');
-        $amount = $request->request->get('amount');
-        $date = $request->request->get('date');
-        $category = $this->entityManager->getRepository(Category::class)->find($request->request->get('category'));
-
         $expense = new Expense();
-        $expense->setName($name);
-        $expense->setAmount($amount);
-        $expense->setDate(new \DateTime($date));
-        $expense->setCategory($category);
+        $expense->setName($request->request->get('name'));
+        $expense->setAmount($request->request->get('amount'));
+        $expense->setDate(new \DateTime($request->request->get('date')));
+        $expense->setPaymentStatus($request->request->get('paymentStatus'));
+
+        if ($paymentDate = $request->request->get('paymentDate')) {
+            $expense->setPaymentDate(new \DateTime($paymentDate));
+        }
+
+        if ($categoryId = $request->request->get('category')) {
+            $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
+            if ($category) {
+                $expense->setCategory($category);
+            }
+        }
 
         $this->entityManager->persist($expense);
         $this->entityManager->flush();
