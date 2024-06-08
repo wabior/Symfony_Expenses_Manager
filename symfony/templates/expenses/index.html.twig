@@ -23,17 +23,19 @@
                 </thead>
                 <tbody>
                 {% for expense in expenses %}
-                    <tr>
-                        {% set fields = [
-                            expense.id,
-                            expense.name,
-                            expense.amount,
-                            expense.date|date('Y-m-d'),
-                            expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A',
-                            expense.category.nameEnglish
-                        ] %}
-                        {% for field in fields %}
-                            <td class="table-cell">{{ field }}</td>
+                    <tr id="expense-{{ expense.id }}">
+                        {% set fields = {
+                            id: expense.id,
+                            name: expense.name,
+                            amount: expense.amount,
+                            date: expense.date|date('Y-m-d'),
+                            paymentDate: expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A',
+                            category: expense.category.nameEnglish
+                        } %}
+                        {% for key, value in fields %}
+                            <td class="table-cell"{% if key == 'paymentDate' %} data-key="paymentDate"{% endif %}>
+                                {{ value }}
+                            </td>
                         {% endfor %}
                         <td class="table-cell status-cell cursor-pointer relative" data-id="{{ expense.id }}">
                             <span class="status-text">{{ expense.paymentStatus|capitalize }}</span>
@@ -71,6 +73,8 @@
             statusSelect.addEventListener('change', function() {
                 const expenseId = cell.getAttribute('data-id');
                 const newStatus = statusSelect.value;
+                const row = document.getElementById(`expense-${expenseId}`);
+                const paymentDateCell = row.querySelector('[data-key="paymentDate"]');
 
                 fetch(`/expenses/update-status/${expenseId}`, {
                     method: 'POST',
@@ -87,6 +91,7 @@
                             statusText.dataset.status = newStatus;
                             statusSelect.classList.add('hidden');
                             statusText.classList.remove('hidden');
+                            paymentDateCell.innerText = new Date().toISOString().split('T')[0];
                         } else {
                             alert('Failed to update status.');
                         }
