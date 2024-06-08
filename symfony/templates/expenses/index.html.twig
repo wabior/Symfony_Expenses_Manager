@@ -4,45 +4,104 @@
 
 {% block content %}
     <div class="container mx-auto">
-
         <h1 class="text-xl font-bold mb-4">Expenses</h1>
 
         <a href="{{ path('expenses_add') }}"
-           class="my-8 inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">Add
-            New Expense
+           class="my-8 inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+            Add New Expense
         </a>
 
         <div class="table-container">
             <table class="min-w-full leading-normal">
                 <thead>
                 <tr class="border-t">
-                    <th class="table-header">ID</th>
-                    <th class="table-header">Name</th>
-                    <th class="table-header">Amount</th>
-                    <th class="table-header">Date</th>
-                    <th class="table-header">Payment Date</th>
-                    <th class="table-header">Payment Status</th>
-                    <th class="table-header">Category</th>
+                    {% set headers = ['ID', 'Name', 'Amount', 'Date', 'Payment Date', 'Category', 'Status'] %}
+                    {% for header in headers %}
+                        <th class="table-header">{{ header }}</th>
+                    {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
                 {% for expense in expenses %}
-                    <tr>
-                        <td class="table-cell">{{ expense.id }}</td>
-                        <td class="table-cell">{{ expense.name }}</td>
-                        <td class="table-cell">{{ expense.amount }}</td>
-                        <td class="table-cell">{{ expense.date|date('Y-m-d') }}</td>
-                        <td class="table-cell">{{ expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A' }}</td>
-                        <td class="table-cell">{{ expense.paymentStatus }}</td>
-                        <td class="table-cell">{{ expense.category.nameEnglish }}</td>
+                    <tr id="expense-{{ expense.id }}">
+                        {% set fields = {
+                            id: expense.id,
+                            name: expense.name,
+                            amount: expense.amount,
+                            date: expense.date|date('Y-m-d'),
+                            paymentDate: expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A',
+                            category: expense.category.nameEnglish
+                        } %}
+                        {% for key, value in fields %}
+                            <td class="table-cell"{% if key == 'paymentDate' %} data-key="paymentDate"{% endif %}>
+                                {{ value }}
+                            </td>
+                        {% endfor %}
+                        <td class="table-cell status-cell cursor-pointer relative" data-id="{{ expense.id }}">
+                            <span class="status-text">{{ expense.paymentStatus|capitalize }}</span>
+                            <select class="status-select absolute right-2 top-2 p-1 hidden w-full">
+                                {% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
+                                {% for status in statuses %}
+                                    <option value="{{ status }}" {% if expense.paymentStatus == status %}selected{% endif %}>
+                                        {{ status|capitalize }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="table-cell">No expenses found.</td>
+                        <td colspan="{{ headers|length }}" class="table-cell">No expenses found.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.status-cell').forEach(cell => {
+            const statusText = cell.querySelector('.status-text');
+            const statusSelect = cell.querySelector('.status-select');
+
+            cell.addEventListener('click', function() {
+                statusText.classList.add('hidden');
+                statusSelect.classList.remove('hidden');
+                statusSelect.focus();
+            });
+
+            statusSelect.addEventListener('change', function() {
+                const expenseId = cell.getAttribute('data-id');
+                const newStatus = statusSelect.value;
+                const row = document.getElementById(`expense-${expenseId}`);
+                const paymentDateCell = row.querySelector('[data-key="paymentDate"]');
+
+                fetch(`/expenses/update-status/${expenseId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token('update-status') }}'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            statusText.innerText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                            statusText.dataset.status = newStatus;
+                            statusSelect.classList.add('hidden');
+                            statusText.classList.remove('hidden');
+                            paymentDateCell.innerText = new Date().toISOString().split('T')[0];
+                        } else {
+                            alert('Failed to update status.');
+                        }
+                    });
+            });
+
+            statusSelect.addEventListener('blur', function() {
+                statusSelect.classList.add('hidden');
+                statusText.classList.remove('hidden');
+            });
+        });
+    </script>
 {% endblock %}
