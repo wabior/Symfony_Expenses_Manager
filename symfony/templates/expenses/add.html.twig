@@ -3,7 +3,6 @@
 {% block title %}Add Expense{% endblock %}
 
 {% block content %}
-
     <div class="container mx-auto mt-4 xl:w-1/3">
         <h1 class="text-2xl font-bold text-gray-900 mb-8">Add a new expense</h1>
         <form action="{{ path('expenses_add') }}" method="post" class="space-y-6 bg-white p-8 shadow-xl rounded-lg">
@@ -11,9 +10,19 @@
                 <label for="name" class="block text-lg font-semibold text-gray-800">Expense Name:</label>
                 <input type="text" id="name" name="name" required class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
             </div>
-            <div>
-                <label for="amount" class="block text-lg font-semibold text-gray-800">Amount:</label>
-                <input type="number" id="amount" name="amount" step="0.01" required class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+            <div class="flex space-x-4">
+                <div class="flex-1">
+                    <label for="amount" class="block text-lg font-semibold text-gray-800">Amount:</label>
+                    <input type="number" id="amount" name="amount" step="0.01" required class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+                </div>
+                <div class="flex-1">
+                    <label for="paymentStatus" class="block text-lg font-semibold text-gray-800">Payment Status:</label>
+                    <select id="paymentStatus" name="paymentStatus" required class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                        <option value="partially_paid">Partially Paid</option>
+                    </select>
+                </div>
             </div>
             <div>
                 <label for="date" class="block text-lg font-semibold text-gray-800">Date:</label>
@@ -28,9 +37,17 @@
                 </select>
             </div>
             <div>
+                <label for="paymentDate" class="block text-lg font-semibold text-gray-800">Payment Date:</label>
+                <input type="date" id="paymentDate" name="paymentDate" class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+            </div>
+            <div>
                 <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">Add Expense</button>
             </div>
         </form>
     </div>
+{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('build/payment_status.js') }}"></script>
 {% endblock %}
