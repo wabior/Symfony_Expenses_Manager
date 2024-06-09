@@ -44,15 +44,25 @@ class ExpenseService
         $this->entityManager->flush();
     }
 
-    public function updateExpenseStatus(int $id, string $status): void
+    public function updateExpenseStatus(int $id, string $status): ?Expense
     {
         $expense = $this->entityManager->getRepository(Expense::class)->find($id);
 
         if ($expense) {
             $expense->setPaymentStatus($status);
-            $expense->setPaymentDate(new \DateTime());
+
+            if ($status !== 'unpaid') {
+                $expense->setPaymentDate(new \DateTime());
+            } else {
+                $expense->setPaymentDate(null);
+            }
+
             $this->entityManager->flush();
+
+            return $expense;
         }
+
+        return null;
     }
 
 

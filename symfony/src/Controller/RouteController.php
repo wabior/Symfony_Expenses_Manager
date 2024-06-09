@@ -69,9 +69,15 @@ class RouteController extends BaseController
         $data = json_decode($request->getContent(), true);
         $newStatus = $data['status'] ?? null;
 
-        if ($newStatus && in_array($newStatus, ['unpaid', 'paid', 'partially_paid'])) {
-            $this->expensesService->updateExpenseStatus($id, $newStatus);
-            return new JsonResponse(['success' => true]);
+        if (in_array($newStatus, ['unpaid', 'paid', 'partially_paid'])) {
+            $expense = $this->expensesService->updateExpenseStatus($id, $newStatus);
+
+            if ($expense) {
+                return new JsonResponse([
+                    'success' => true,
+                    'paymentDate' => $expense->getPaymentDate() ? $expense->getPaymentDate()->format('Y-m-d') : 'N/A',
+                ]);
+            }
         }
 
         return new JsonResponse(['success' => false], 400);

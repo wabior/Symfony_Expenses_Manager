@@ -25,3 +25,11 @@
     }
 }
 
+/* Add this in your main CSS file */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hover\:text-shadow:hover {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
