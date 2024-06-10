@@ -22,6 +22,7 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('payment_status', './assets/js/payment_status.js')
+    .addEntry('expenses_index', './templates/expenses/index.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -50,8 +51,8 @@ Encore
 
     // enables and configure @babel/preset-env polyfills
     .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = '3.23';
+        config.useBuiltIns = 'entry';
+        config.corejs = '3';
     })
 
     // enables Sass/SCSS support

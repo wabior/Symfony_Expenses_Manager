@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\MenuRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,12 +18,10 @@ class RouteController extends BaseController
         RouterInterface $router,
         ExpenseService $expensesService,
         MenuRepository $menuRepository,
-        EntityManagerInterface $entityManager
     )
     {
         parent::__construct($router, $menuRepository);
         $this->expensesService = $expensesService;
-        $this->entityManager = $entityManager;
     }
 
     #[Route('/', name: 'home', options: ['friendly_name' => 'Start', 'order' => 1])]
@@ -69,9 +66,15 @@ class RouteController extends BaseController
         $data = json_decode($request->getContent(), true);
         $newStatus = $data['status'] ?? null;
 
-        if ($newStatus && in_array($newStatus, ['unpaid', 'paid', 'partially_paid'])) {
-            $this->expensesService->updateExpenseStatus($id, $newStatus);
-            return new JsonResponse(['success' => true]);
+        if (in_array($newStatus, ['unpaid', 'paid', 'partially_paid'])) {
+            $expense = $this->expensesService->updateExpenseStatus($id, $newStatus);
+
+            if ($expense) {
+                return new JsonResponse([
+                    'success' => true,
+                    'paymentDate' => $expense->getPaymentDate() ? $expense->getPaymentDate()->format('Y-m-d') : 'N/A',
+                ]);
+            }
         }
 
         return new JsonResponse(['success' => false], 400);

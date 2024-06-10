@@ -3,6 +3,7 @@
 <head>
     {% block head %}
         <meta charset="UTF-8">
+        <meta name="csrf-token" content="{{ csrf_token('update-status') }}">
         <title>{% block title %}My Website{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
             {{ encore_entry_link_tags('app') }}
@@ -34,7 +35,6 @@
 </div>
 {% block javascripts %}
     <script src="{{ asset('build/runtime.js') }}"></script>
-    <script src="{{ asset('build/vendors~app.js') }}"></script>
     <script src="{{ asset('build/app.js') }}"></script>
 {% endblock %}
 </body>

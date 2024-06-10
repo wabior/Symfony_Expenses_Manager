@@ -15,7 +15,7 @@
             <table class="min-w-full leading-normal">
                 <thead>
                 <tr class="border-t">
-                    {% set headers = ['ID', 'Name', 'Amount', 'Date', 'Payment Date', 'Category', 'Status'] %}
+                    {% set headers = ['ID', 'Name', 'Cost', 'Date', 'Payment Date', 'Category', 'Status'] %}
                     {% for header in headers %}
                         <th class="table-header">{{ header }}</th>
                     {% endfor %}
@@ -38,9 +38,14 @@
                             </td>
                         {% endfor %}
                         <td class="table-cell status-cell cursor-pointer relative" data-id="{{ expense.id }}">
-                            <span class="status-text">{{ expense.paymentStatus|capitalize }}</span>
-                            <select class="status-select absolute right-2 top-2 p-1 hidden w-full">
-                                {% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
+                            <span class="status-text hover:text-shadow
+                                {% if expense.paymentStatus == 'unpaid'%} text-red-500 {% endif %}
+                                {% if expense.paymentStatus == 'paid'%} text-green-600 {% endif %}
+                            ">
+                                {{ expense.paymentStatus|capitalize }}
+                            </span>
+                            <select class="status-select absolute right-2 top-2 p-1 hidden w-full cursor-pointer">
+                                {% set statuses = ['unpaid', 'paid'] %}
                                 {% for status in statuses %}
                                     <option value="{{ status }}" {% if expense.paymentStatus == status %}selected{% endif %}>
                                         {{ status|capitalize }}
@@ -59,49 +64,9 @@
         </div>
     </div>
 
-    <script>
-        document.querySelectorAll('.status-cell').forEach(cell => {
-            const statusText = cell.querySelector('.status-text');
-            const statusSelect = cell.querySelector('.status-select');
+{% endblock %}
 
-            cell.addEventListener('click', function() {
-                statusText.classList.add('hidden');
-                statusSelect.classList.remove('hidden');
-                statusSelect.focus();
-            });
-
-            statusSelect.addEventListener('change', function() {
-                const expenseId = cell.getAttribute('data-id');
-                const newStatus = statusSelect.value;
-                const row = document.getElementById(`expense-${expenseId}`);
-                const paymentDateCell = row.querySelector('[data-key="paymentDate"]');
-
-                fetch(`/expenses/update-status/${expenseId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token('update-status') }}'
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            statusText.innerText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                            statusText.dataset.status = newStatus;
-                            statusSelect.classList.add('hidden');
-                            statusText.classList.remove('hidden');
-                            paymentDateCell.innerText = new Date().toISOString().split('T')[0];
-                        } else {
-                            alert('Failed to update status.');
-                        }
-                    });
-            });
-
-            statusSelect.addEventListener('blur', function() {
-                statusSelect.classList.add('hidden');
-                statusText.classList.remove('hidden');
-            });
-        });
-    </script>
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('build/expenses_index.js') }}"></script>
 {% endblock %}
