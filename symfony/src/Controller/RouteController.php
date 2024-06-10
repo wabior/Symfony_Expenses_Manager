@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\MenuRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,12 +18,10 @@ class RouteController extends BaseController
         RouterInterface $router,
         ExpenseService $expensesService,
         MenuRepository $menuRepository,
-        EntityManagerInterface $entityManager
     )
     {
         parent::__construct($router, $menuRepository);
         $this->expensesService = $expensesService;
-        $this->entityManager = $entityManager;
     }
 
     #[Route('/', name: 'home', options: ['friendly_name' => 'Start', 'order' => 1])]
