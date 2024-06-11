@@ -18,4 +18,15 @@ class ExpenseRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Expense::class);
     }
+
+    public function findByMonth(\DateTime $startDate, \DateTime $endDate): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->where('e.date >= :startDate')
+            ->andWhere('e.date < :endDate')
+            ->setParameter('startDate', $startDate->format('Y-m-d'))
+            ->setParameter('endDate', $endDate->format('Y-m-d'));
+
+        return $qb->getQuery()->getResult();
+    }
 }

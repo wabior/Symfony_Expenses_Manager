@@ -21,6 +21,14 @@ class ExpenseService
         return $this->entityManager->getRepository(Expense::class)->findAll();
     }
 
+    public function getExpensesByMonth(int $year, int $month): array
+    {
+        $startDate = new \DateTime("$year-$month-01");
+        $endDate = (clone $startDate)->modify('+1 month');
+
+        return $this->entityManager->getRepository(Expense::class)->findByMonth($startDate, $endDate);
+    }
+
     public function addExpense(Request $request): void
     {
         $expense = new Expense();
@@ -69,5 +77,22 @@ class ExpenseService
     public function getAllCategories(): array
     {
         return $this->entityManager->getRepository(Category::class)->findAll();
+    }
+
+    public function getNavigationMonths(int $year, int $month): array
+    {
+        $prevMonth = ($month == 1) ? 12 : $month - 1;
+        $prevYear = ($month == 1) ? $year - 1 : $year;
+        $nextMonth = ($month == 12) ? 1 : $month + 1;
+        $nextYear = ($month == 12) ? $year + 1 : $year;
+
+        return [
+            'year' => $year,
+            'month' => str_pad($month, 2, '0', STR_PAD_LEFT),
+            'prevYear' => $prevYear,
+            'prevMonth' => str_pad($prevMonth, 2, '0', STR_PAD_LEFT),
+            'nextYear' => $nextYear,
+            'nextMonth' => str_pad($nextMonth, 2, '0', STR_PAD_LEFT),
+        ];
     }
 }
