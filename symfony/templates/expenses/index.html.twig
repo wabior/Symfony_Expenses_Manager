@@ -4,12 +4,30 @@
 
 {% block content %}
     <div class="container mx-auto">
-        <h1 class="text-xl font-bold mb-4">Expenses</h1>
+        <h1 class="text-xl font-bold my-4">Expenses</h1>
 
-        <a href="{{ path('expenses_add') }}"
-           class="my-8 inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-            Add New Expense
-        </a>
+        <nav class="flex justify-between items-center mb-4" aria-label="Month navigation">
+            <div class="flex space-x-4">
+                <a href="{{ path('expenses', { year: prevYear, month: prevMonth }) }}"
+                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    &lt; Previous
+                </a>
+
+                <span class="inline-block w-auto bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded">
+                    {{ month }} - {{ year }}
+                </span>
+
+                <a href="{{ path('expenses', { year: nextYear, month: nextMonth }) }}"
+                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    Next &gt;
+                </a>
+            </div>
+
+            <a href="{{ path('expenses_add') }}"
+               class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                Add New Expense
+            </a>
+        </nav>
 
         <div class="table-container">
             <table class="min-w-full leading-normal">
@@ -63,7 +81,6 @@
             </table>
         </div>
     </div>
-
 {% endblock %}
 
 {% block javascripts %}

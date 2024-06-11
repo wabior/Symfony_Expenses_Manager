@@ -36,13 +36,18 @@ class RouteController extends BaseController
         return $this->renderWithRoutes('about.html.twig');
     }
 
-    #[Route('/expenses', name: 'expenses', options: ['friendly_name' => 'Wydatki', 'order' => 2])]
-    public function expenses(): Response
+    #[Route('/expenses/{year?}/{month?}', name: 'expenses', requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'], options: ['friendly_name' => 'Wydatki', 'order' => 2])]
+    public function expenses(int $year = null, int $month = null): Response
     {
-        $expenses = $this->expensesService->getAllExpenses();
-        return $this->renderWithRoutes('expenses/index.html.twig', [
+        $year = $year ?? (int)date('Y');
+        $month = $month ?? (int)date('m');
+
+        $expenses = $this->expensesService->getExpensesByMonth($year, $month);
+        $navigationMonths = $this->expensesService->getNavigationMonths($year, $month);
+
+        return $this->renderWithRoutes('expenses/index.html.twig', array_merge([
             'expenses' => $expenses,
-        ]);
+        ], $navigationMonths));
     }
 
     #[Route('/expenses/add', name: 'expenses_add', methods: ['GET', 'POST'])]
