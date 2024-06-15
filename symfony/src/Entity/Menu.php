@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: "App\Repository\MenuRepository")]
 class Menu
@@ -22,7 +21,7 @@ class Menu
     #[ORM\Column(type: "string", length: 255)]
     private $path;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "integer", name: "menu_order")]
     private $order;
 
     #[ORM\Column(type: "boolean")]
@@ -89,4 +88,3 @@ class Menu
         return $this;
     }
 }
-

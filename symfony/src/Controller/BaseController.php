@@ -9,13 +9,11 @@ use App\Repository\MenuRepository;
 
 class BaseController extends AbstractController
 {
-    protected RouterInterface $router;
-    protected MenuRepository $menuRepository;
-
-    public function __construct(RouterInterface $router, MenuRepository $menuRepository)
+    public function __construct(
+        protected RouterInterface $router,
+        protected MenuRepository  $menuRepository
+    )
     {
-        $this->router = $router;
-        $this->menuRepository = $menuRepository;
     }
 
     protected function renderWithRoutes(string $view, array $parameters = [], ?Response $response = null): Response

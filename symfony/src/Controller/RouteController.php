@@ -12,16 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RouteController extends BaseController
 {
-    private ExpenseService $expensesService;
-
     public function __construct(
         RouterInterface $router,
-        ExpenseService $expensesService,
-        MenuRepository $menuRepository,
+        private ExpenseService $expensesService,
+        protected MenuRepository $menuRepository,
     )
     {
-        parent::__construct($router, $menuRepository);
-        $this->expensesService = $expensesService;
     }
 
     #[Route('/', name: 'home', options: ['friendly_name' => 'Start', 'order' => 1])]
