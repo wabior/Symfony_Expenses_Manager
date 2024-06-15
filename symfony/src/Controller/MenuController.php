@@ -11,17 +11,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class MenuController extends BaseController
 {
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        RouterInterface $router,
-        MenuRepository $menuRepository
+        private EntityManagerInterface $entityManager,
+        protected RouterInterface      $router,
+        protected MenuRepository       $menuRepository
     )
     {
-        parent::__construct($router, $menuRepository);
-        $this->entityManager = $entityManager;
-        $this->menuRepository = $menuRepository;
     }
 
     #[Route('/admin/menu', name: 'admin_menu')]
@@ -41,7 +36,7 @@ class MenuController extends BaseController
 
         foreach ($this->menuRepository->findAll() as $menu) {
             $id = $menu->getId();
-            $isActive = isset($data['menu'][$id]['activated']) ? (bool)$data['menu'][$id]['activated'] : false;
+            $isActive = isset($data['menu'][$id]['activated']) && $data['menu'][$id]['activated'];
             $menu->setActivated($isActive);
             $this->entityManager->persist($menu);
         }
