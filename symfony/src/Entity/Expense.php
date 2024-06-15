@@ -34,6 +34,10 @@ class Expense
     #[ORM\JoinColumn(nullable: false)]
     private $category;
 
+    #[ORM\ManyToOne(targetEntity: Recurrence::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private $recurrence;
+
     #[ORM\Column(type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $createdAt;
 
@@ -53,7 +57,7 @@ class Expense
         $this->updatedAt = new \DateTime();
     }
 
-    // Gettery i settery
+    // Getters and Setters
 
     public function getId(): ?int
     {
@@ -123,6 +127,17 @@ class Expense
     public function setCategory(Category $category): self
     {
         $this->category = $category;
+        return $this;
+    }
+
+    public function getRecurrence(): ?Recurrence
+    {
+        return $this->recurrence;
+    }
+
+    public function setRecurrence(?Recurrence $recurrence): self
+    {
+        $this->recurrence = $recurrence;
         return $this;
     }
 }

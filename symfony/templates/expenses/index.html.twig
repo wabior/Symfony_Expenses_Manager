@@ -33,7 +33,7 @@
             <table class="min-w-full leading-normal">
                 <thead>
                 <tr class="border-t">
-                    {% set headers = ['ID', 'Name', 'Cost', 'Date', 'Payment Date', 'Category', 'Status'] %}
+                    {% set headers = ['ID', 'Name', 'Cost', 'Date', 'Payment Date', 'Category', 'Recurrence', 'Status'] %}
                     {% for header in headers %}
                         <th class="table-header">{{ header }}</th>
                     {% endfor %}
@@ -48,13 +48,15 @@
                             amount: expense.amount,
                             date: expense.date|date('Y-m-d'),
                             paymentDate: expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A',
-                            category: expense.category.nameEnglish
+                            category: expense.category.namePolish,
+                            recurrence: expense.recurrence ? expense.recurrence.period|capitalize : 'N/A'
                         } %}
                         {% for key, value in fields %}
                             <td class="table-cell"{% if key == 'paymentDate' %} data-key="paymentDate"{% endif %}>
                                 {{ value }}
                             </td>
                         {% endfor %}
+                        <!-- Status column must remain the last column -->
                         <td class="table-cell status-cell cursor-pointer relative" data-id="{{ expense.id }}">
                             <span class="status-text hover:text-shadow
                                 {% if expense.paymentStatus == 'unpaid'%} text-red-500 {% endif %}

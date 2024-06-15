@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Expense;
+use App\Entity\Recurrence;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,6 +47,19 @@ class ExpenseService
             if ($category) {
                 $expense->setCategory($category);
             }
+        }
+
+        // Add recurrence if provided
+        if ($recurrencePeriod = $request->request->get('recurrencePeriod')) {
+            $recurrence = new Recurrence();
+            $recurrence->setPeriod($recurrencePeriod);
+
+            if ($endDate = $request->request->get('endDate')) {
+                $recurrence->setEndDate(new \DateTime($endDate));
+            }
+
+            $this->entityManager->persist($recurrence);
+            $expense->setRecurrence($recurrence);
         }
 
         $this->entityManager->persist($expense);
