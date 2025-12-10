@@ -48,15 +48,8 @@ class BaseController extends AbstractController
             // Niektóre strony wymagają logowania
             $requiresAuth = in_array($routeName, ['expenses', 'categories', 'admin_menu']);
 
-            // Niektóre strony są dostępne tylko dla niezalogowanych użytkowników (gości)
-            $guestOnly = in_array($routeName, ['app_register']);
-
             if ($requiresAuth && !$user) {
                 return false; // Ukryj jeśli wymaga autoryzacji ale użytkownik nie jest zalogowany
-            }
-
-            if ($guestOnly && $user) {
-                return false; // Ukryj jeśli dostępne tylko dla gości ale użytkownik jest zalogowany
             }
 
             return true;

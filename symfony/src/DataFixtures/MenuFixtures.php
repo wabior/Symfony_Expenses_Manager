@@ -47,13 +47,6 @@ class MenuFixtures extends Fixture
                 'order' => 5,
                 'activated' => true,
             ],
-            [
-                'routeName' => 'app_register',
-                'friendlyName' => 'Rejestracja',
-                'path' => '/register',
-                'order' => 6,
-                'activated' => true,
-            ]
         ];
 
         foreach ($menus as $menuData) {

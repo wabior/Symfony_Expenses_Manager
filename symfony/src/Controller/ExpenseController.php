@@ -7,6 +7,7 @@ use App\Service\ExpenseService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -63,5 +64,28 @@ class ExpenseController extends BaseController
         return $this->renderWithRoutes('expenses/add.html.twig', [
             'categories' => $categories,
         ]);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/expenses/update-status/{id}', name: 'expenses_update_status', methods: ['POST'])]
+    public function updateStatus(int $id, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $status = $data['status'] ?? null;
+
+        if (!$status || !in_array($status, ['unpaid', 'paid'])) {
+            return new JsonResponse(['success' => false], 400);
+        }
+
+        $expense = $this->expenseService->updateExpenseStatus($id, $status);
+
+        if ($expense) {
+            return new JsonResponse([
+                'success' => true,
+                'paymentDate' => $expense->getPaymentDate()?->format('Y-m-d') ?: 'N/A'
+            ]);
+        }
+
+        return new JsonResponse(['success' => false], 404);
     }
 }
