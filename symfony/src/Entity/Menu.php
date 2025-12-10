@@ -21,7 +21,7 @@ class Menu
     #[ORM\Column(type: "string", length: 255)]
     private $path;
 
-    #[ORM\Column(type: "integer", name: "menu_order")]
+    #[ORM\Column(type: "integer", name: "`order`")]
     private $order;
 
     #[ORM\Column(type: "boolean")]

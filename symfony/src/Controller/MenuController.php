@@ -13,10 +13,11 @@ class MenuController extends BaseController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        protected RouterInterface      $router,
-        protected MenuRepository       $menuRepository
+        RouterInterface $router,
+        MenuRepository $menuRepository
     )
     {
+        parent::__construct($router, $menuRepository);
     }
 
     #[Route('/admin/menu', name: 'admin_menu')]

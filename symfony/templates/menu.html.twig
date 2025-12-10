@@ -3,5 +3,18 @@
         {% for item in menu_items %}
             <li class="p-4"><a href="{{ item.path }}">{{ item.friendly_name }}</a></li>
         {% endfor %}
+
+        {% if user %}
+            <li class="p-4">
+                <span class="text-gray-700">Zalogowany: {{ user.userIdentifier }}</span>
+            </li>
+            <li class="p-4">
+                <a href="{{ path('app_logout') }}" class="text-red-600 hover:text-red-800">Wyloguj</a>
+            </li>
+        {% else %}
+            <li class="p-4">
+                <a href="{{ path('app_login') }}" class="text-blue-600 hover:text-blue-800">Zaloguj</a>
+            </li>
+        {% endif %}
     </ul>
 </nav>

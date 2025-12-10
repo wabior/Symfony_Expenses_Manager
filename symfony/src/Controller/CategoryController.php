@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CategoryController extends BaseController
 {
@@ -21,6 +22,7 @@ class CategoryController extends BaseController
         parent::__construct($router, $menuRepository);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/categories', name: 'categories', options: ['friendly_name' => 'Kategorie', 'order' => 3])]
     public function index(): Response
     {
@@ -31,6 +33,7 @@ class CategoryController extends BaseController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/categories/add', name: 'category_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
