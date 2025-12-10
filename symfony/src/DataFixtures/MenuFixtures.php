@@ -8,7 +8,7 @@ use App\Entity\Menu;
 
 class MenuFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         // Definiowanie pozycji menu
         $menus = [

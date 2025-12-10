@@ -8,7 +8,7 @@ use App\Entity\Category;
 
 class CategoryFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $categories = [
             'Food' => 'Jedzenie',

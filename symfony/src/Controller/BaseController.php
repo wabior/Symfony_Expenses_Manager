@@ -31,15 +31,32 @@ class BaseController extends AbstractController
                 'friendly_name' => $menuItem->getFriendlyName(),
                 'order' => $menuItem->getOrder(),
                 'activated' => $menuItem->isActivated(),
+                'route_name' => $menuItem->getRouteName(),
             ];
         }
 
-        // Filtruj tylko aktywne elementy menu
-        $filteredRoutes = array_filter($filteredRoutes, function ($route) {
-            return $route['activated'];
+        // Filtruj menu w zależności od statusu logowania użytkownika
+        $user = $this->getUser();
+        $filteredRoutes = array_filter($filteredRoutes, function ($route) use ($user) {
+            // Elementy menu są aktywne tylko jeśli są włączone w bazie
+            if (!$route['activated']) {
+                return false;
+            }
+
+            $routeName = $route['route_name'];
+
+            // Niektóre strony wymagają logowania
+            $requiresAuth = in_array($routeName, ['expenses', 'categories', 'admin_menu']);
+
+            if ($requiresAuth && !$user) {
+                return false; // Ukryj jeśli wymaga autoryzacji ale użytkownik nie jest zalogowany
+            }
+
+            return true;
         });
 
         $parameters['menu_items'] = $filteredRoutes;
+        $parameters['user'] = $user;
 
         return parent::render($view, $parameters, $response);
     }

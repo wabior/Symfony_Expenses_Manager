@@ -10,7 +10,7 @@ use Faker\Factory;
 
 class ExpenseFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $faker = Factory::create();
 

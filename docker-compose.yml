@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   php:
 #    image: php:8.2-apache
@@ -23,14 +21,18 @@ services:
       TZ: Europe/Warsaw
     command: >
       bash -c "
-        if [ ! -d /var/www/html/symfony/vendor ]; then 
-          composer create-project symfony/skeleton /var/www/html/symfony; 
-        fi && 
         cd /var/www/html/symfony &&
-        composer require symfony/webpack-encore-bundle &&
-        npm install &&
-        npm install -D tailwindcss postcss postcss-loader autoprefixer &&
-        npx tailwindcss init -p &&
+        if [ ! -f composer.json ]; then 
+          composer create-project symfony/skeleton .; 
+        fi &&
+        if [ ! -d vendor ]; then 
+          composer install; 
+        fi &&
+        if [ ! -d node_modules ]; then 
+          npm install &&
+          npm install -D tailwindcss postcss postcss-loader autoprefixer &&
+          npx tailwindcss init -p; 
+        fi &&
         apache2-foreground
       "
 
