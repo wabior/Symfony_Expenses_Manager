@@ -30,6 +30,7 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/categories, roles: ROLE_USER }
         - { path: ^/expenses, roles: ROLE_USER }
+        - { path: ^/register, allow_if: "not is_authenticated()" }
 
 when@test:
     security:
