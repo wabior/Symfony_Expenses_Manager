@@ -41,19 +41,19 @@ class MenuFixtures extends Fixture
                 'activated' => true,
             ],
             [
-                'routeName' => 'app_register',
-                'friendlyName' => 'Rejestracja',
-                'path' => '/register',
-                'order' => 4,
-                'activated' => true,
-            ],
-            [
                 'routeName' => 'about',
                 'friendlyName' => 'About',
                 'path' => '/about',
                 'order' => 5,
                 'activated' => true,
             ],
+            [
+                'routeName' => 'app_register',
+                'friendlyName' => 'Rejestracja',
+                'path' => '/register',
+                'order' => 6,
+                'activated' => true,
+            ]
         ];
 
         foreach ($menus as $menuData) {
