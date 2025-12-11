@@ -24,14 +24,16 @@ class ExpenseController extends BaseController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/expenses', name: 'expenses', defaults: ['year' => null, 'month' => null])]
+    #[Route('/expenses/{year}/{month}', name: 'expenses', defaults: ['year' => null, 'month' => null])]
     public function index(Request $request, ?int $year = null, ?int $month = null): Response
     {
         // Default to current month if no params provided
         if ($year === null || $month === null) {
             $now = new \DateTime();
-            $year = $now->format('Y');
-            $month = $now->format('n');
+            return $this->redirectToRoute('expenses', [
+                'year' => $now->format('Y'),
+                'month' => $now->format('n')
+            ]);
         }
 
         $expenses = $this->expenseService->getExpensesByMonth($year, $month);
@@ -56,7 +58,11 @@ class ExpenseController extends BaseController
     {
         if ($request->isMethod('POST')) {
             $this->expenseService->addExpense($request);
-            return $this->redirectToRoute('expenses');
+            $now = new \DateTime();
+            return $this->redirectToRoute('expenses', [
+                'year' => $now->format('Y'),
+                'month' => $now->format('n')
+            ]);
         }
 
         $categories = $this->expenseService->getAllCategories();

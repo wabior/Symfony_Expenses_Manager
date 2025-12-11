@@ -2,13 +2,13 @@ document.querySelectorAll('.status-cell').forEach(cell => {
     const statusText = cell.querySelector('.status-text');
     const statusSelect = cell.querySelector('.status-select');
 
-    cell.addEventListener('click', function() {
+    cell.addEventListener('click', () => {
         statusText.classList.add('hidden');
         statusSelect.classList.remove('hidden');
         statusSelect.focus();
     });
 
-    statusSelect.addEventListener('change', function() {
+    statusSelect.addEventListener('change', () => {
         const expenseId = cell.getAttribute('data-id');
         const newStatus = statusSelect.value;
         const row = document.getElementById(`expense-${expenseId}`);
@@ -18,8 +18,9 @@ document.querySelectorAll('.status-cell').forEach(cell => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')            },
-            body: JSON.stringify({ status: newStatus })
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')            
+            },
+            body: JSON.stringify({status: newStatus})
         })
             .then(response => response.json())
             .then(data => {
@@ -35,7 +36,7 @@ document.querySelectorAll('.status-cell').forEach(cell => {
             });
     });
 
-    statusSelect.addEventListener('blur', function() {
+    statusSelect.addEventListener('blur', () => {
         statusSelect.classList.add('hidden');
         statusText.classList.remove('hidden');
     });
