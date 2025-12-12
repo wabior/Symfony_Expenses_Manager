@@ -207,24 +207,46 @@ Tworzy podstawowe kategorie:
 
 ## Aktualny stan funkcjonalności
 
-### Dostępne funkcje:
+### Dostępne funkcje (Version 1.0):
 1. ✅ Logowanie/rejestracja użytkowników
-2. ✅ Zarządzanie kategoriami (CRUD)
-3. ✅ Dodawanie wydatków
+2. ✅ Dodawanie kategorii (bez edycji/usuwania)
+3. ✅ Dodawanie wydatków (bez edycji/usuwania)
 4. ✅ Wyświetlanie wydatków wg miesięcy
-5. ✅ Zmiana statusu płatności (unpaid/paid)
+5. ✅ Zmiana statusu płatności (unpaid/paid) przez AJAX
 6. ✅ Nawigacja między miesiącami
 7. ✅ Menu administracyjne
 
-### Brakujące funkcje:
+### Krytyczne problemy bezpieczeństwa:
+1. ❌ **BRAK ISOLACJI DANYCH** - Wydatki nie są przypisane do użytkowników
+2. ❌ **ROW-LEVEL SECURITY** - Wszyscy użytkownicy widzą wszystkie wydatki
+3. ❌ **USER-EXPENSE RELATIONSHIP** - Brak relacji między User a Expense
+
+### Brakujące funkcje krytyczne:
+1. ❌ Pełne zarządzanie kategoriami (edycja/usuwanie)
+2. ❌ Pełne zarządzanie wydatkami (edycja/usuwanie)
+3. ❌ Operacje masowe na wydatkach
+
+### Brakujące funkcje zaawansowane:
 1. ❌ Wydatki cykliczne (recurring expenses)
-2. ❌ Tworzenie nowego miesiąca z przeniesieniem nieopłaconych wydatków cyklicznych
-3. ❌ Edycja/usuwanie wydatków
-4. ❌ Edycja/usuwanie kategorii
-5. ❌ Raporty/statystyki
-6. ❌ Eksport danych
-7. ❌ Wielowalutowość
-8. ❌ Załączniki do wydatków
+2. ❌ Raporty/statystyki i dashboard
+3. ❌ Eksport danych (CSV/PDF/Excel)
+4. ❌ Zaawansowane wyszukiwanie
+5. ❌ Sortowanie tabel i filtry
+6. ❌ Wielojęzyczność (angielski/polski)
+7. ❌ Optymalizacja mobilna i dark mode
+
+## Plan rozwoju - Milestone'y
+
+Zobacz `docs/milestones.md` dla szczegółowego planu rozwoju podzielonego na kluczowe milestone'y:
+
+1. **Secure Multi-User Expense Management** - Bezpieczna izolacja danych użytkowników
+2. **Complete Expense CRUD Operations** - Pełne zarządzanie wydatkami
+3. **Recurring Expenses System Operational** - System wydatków cyklicznych
+4. **Polished User Interface & Experience** - Profesjonalny interfejs użytkownika
+5. **Professional Reporting & Analytics** - Raporty i analityka
+6. **Advanced Features & Future-Proofing** - Zaawansowane funkcje
+
+**Aktualny status wszystkich milestone'ów**: Nie rozpoczęte
 
 ## Konfiguracja
 

@@ -10,11 +10,21 @@
 ```
 docs/
 ├── README_for_AI.md                    # Ten plik - instrukcje użycia
+├── milestones.md                       # Kluczowe milestone'y rozwoju
+├── github_issues.md                    # Szczegółowa lista zadań GitHub
+├── github_context.md                   # Aktualny stan issues z GitHub (auto-generated)
 ├── ai_analysis.md                      # Pełna analiza aplikacji
 ├── ai_development_plan.md              # Plan rozwoju na przyszłość
 ├── ai_recurring_expenses_spec.md       # Specyfikacja wydatków cyklicznych
 ├── ai_scalability_analysis.md          # Analiza skalowalności i wydajności
 └── ai_project_structure.md             # Struktura projektu - podsumowanie
+```
+
+### Narzędzia CLI w `scripts/`:
+```
+scripts/
+├── github_sync.sh                      # Synchronizacja issues z GitHub
+└── README.md                           # Dokumentacja narzędzi CLI
 ```
 
 ## Jak korzystać z dokumentacji
@@ -23,9 +33,13 @@ docs/
 
 1. **Przeczytaj `.cursorrules`** - podstawowe informacje o projekcie
 2. **Sprawdź `.cursor/rules.md`** - konwencje kodowania i przykłady
-3. **Zobacz `docs/ai_analysis.md`** - zrozumienie aktualnego stanu aplikacji
-4. **Sprawdź `docs/ai_development_plan.md`** - czy nowa funkcja jest już zaplanowana
-5. **Zobacz `docs/ai_project_structure.md`** - szybkie przypomnienie struktury
+3. **Zobacz `docs/milestones.md`** - kluczowe cele rozwoju i status milestone'ów
+4. **Zobacz `docs/github_issues.md`** - szczegółowa lista wszystkich zadań do wykonania
+5. **Zsynchronizuj z GitHub**: `./scripts/github_sync.sh sync` - pobierz aktualny stan issues
+6. **Zobacz `docs/github_context.md`** - aktualny stan issues z GitHub (po synchronizacji)
+7. **Zobacz `docs/ai_analysis.md`** - zrozumienie aktualnego stanu aplikacji
+8. **Sprawdź `docs/ai_development_plan.md`** - czy nowa funkcja jest już zaplanowana
+9. **Zobacz `docs/ai_project_structure.md`** - szybkie przypomnienie struktury
 
 ### Dla konkretnych zadań:
 
@@ -111,10 +125,22 @@ docs/
 ✅ Zarządzanie kategoriami
 ✅ Nawigacja między miesiącami
 
-### Planowane (Version 2.0):
-🔄 Wydatki cykliczne
-🔄 Tworzenie nowego miesiąca
-🔄 Edycja/usuwanie wydatków
+### Przygotowanie do deploymentu AWS:
+✅ Naprawiona konfiguracja bazy danych (MySQL zamiast PostgreSQL)
+✅ Utworzona konfiguracja produkcyjna (.env.prod)
+✅ Przetestowany build assets produkcyjnych
+✅ Przygotowany checklist pre-deployment
+✅ Kompletny plan deploymentu na AWS
+
+### Planowane milestone'y (Version 2.0+):
+🔄 Secure Multi-User Expense Management
+🔄 Complete Expense CRUD Operations
+🔄 Recurring Expenses System Operational
+🔄 Polished User Interface & Experience
+🔄 Professional Reporting & Analytics
+🔄 Advanced Features & Future-Proofing
+
+Zobacz `docs/milestones.md` dla szczegółowych opisów i statusu.
 
 ## Zasady bezpieczeństwa
 
@@ -131,10 +157,19 @@ docs/
 
 ## Deployment
 
-- Docker + Docker Compose
+- **Lokalnie:** Docker + Docker Compose
+- **Produkcja:** AWS (EC2 + RDS) - Free Tier przez 12 miesięcy
 - Symfony Flex dla pakietów
 - Webpack Encore dla assetów
 - Doctrine migrations dla bazy
+
+### Przygotowanie do AWS Deployment
+
+1. **Konfiguracja bazy danych:** Zmieniona z PostgreSQL na MySQL dla kompatybilności z AWS RDS
+2. **Środowisko produkcyjne:** Utworzony plik `.env.prod` z konfiguracją bezpieczną
+3. **Assets produkcyjne:** Przetestowany build dla środowiska produkcyjnego
+4. **Checklist deployment:** Szczegółowa lista kroków w `docs/pre_deployment_checklist.md`
+5. **Plan deployment:** Kompletny przewodnik w `docs/aws_deployment_plan.md`
 
 ---
 
@@ -152,6 +187,102 @@ docs/
 - [ ] Sprawdzono `docs/ai_scalability_analysis.md` (dla funkcji wpływających na wydajność)
 - [ ] Zaplanowano testy
 
+## Integracja z GitHub
+
+### Jak skonfigurowaliśmy połączenie z GitHub
+
+1. **Instalacja GitHub CLI:**
+   ```bash
+   # Ubuntu/Debian
+   curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+   sudo apt update && sudo apt install gh jq
+   ```
+
+2. **Autoryzacja:**
+   ```bash
+   gh auth login  # Wybór metody autoryzacji (token/SSH/web)
+   ```
+
+3. **Synchronizacja danych:**
+   - `scripts/github_sync.sh status` - sprawdź status issues
+   - `scripts/github_sync.sh sync` - synchronizuj wszystkie issues do `docs/github_context.md`
+
+### Co możemy robić dzięki integracji z GitHub
+
+#### 🤖 **Dla AI:**
+- **Aktualny kontekst zadań** - AI zawsze wie które issues są otwarte/zamknięte
+- **Przypisane milestone'y** - AI zna cele rozwoju i priorytety
+- **Status rozwoju** - AI może śledzić postęp prac
+- **Dokładne wymagania** - AI ma dostęp do pełnych opisów i kryteriów akceptacji
+
+#### 👥 **Dla programistów:**
+- **Synchronizacja przed pracą** - zawsze aktualne informacje o zadaniach
+- **Sprawdzanie milestone'ów** - `gh api repos/wabior/Symfony_Expenses_Manager/milestones`
+- **Lista issues** - `gh issue list --repo wabior/Symfony_Expenses_Manager`
+- **Szczegóły issue** - `gh issue view 123 --repo wabior/Symfony_Expenses_Manager`
+
+#### 📊 **Dostępne dane:**
+- **Issues**: numery, tytuły, statusy, etykiety, milestone'y, daty
+- **Milestone'y**: cele, opisy, kryteria akceptacji, liczba issues
+- **Postęp**: które zadania są ukończone, które w trakcie
+
+### Jak czytać milestone'y
+
+#### Przegląd milestone'ów:
+```bash
+gh api repos/wabior/Symfony_Expenses_Manager/milestones | jq -r '.[] | "\(.number). \(.title) - \(.open_issues) issues"'
+```
+
+#### Szczegóły konkretnego milestone'u:
+```bash
+gh api repos/wabior/Symfony_Expenses_Manager/milestones/1 | jq '.description'
+```
+
+#### Issues w milestone'ach:
+```bash
+gh issue list --repo wabior/Symfony_Expenses_Manager --milestone "Secure Multi-User Expense Management"
+```
+
+### Pliki związane z GitHub
+
+- **`docs/github_context.md`** - automatycznie generowany plik z aktualnymi issues (po synchronizacji)
+- **`docs/milestones.md`** - ręcznie zarządzane opisy milestone'ów
+- **`docs/github_issues.md`** - szczegółowe opisy wszystkich zadań do wykonania
+- **`scripts/github_sync.sh`** - skrypt do synchronizacji z GitHub
+
+### Workflow pracy z GitHub
+
+1. **Przed rozpoczęciem pracy:** `./scripts/github_sync.sh sync`
+2. **AI czyta kontekst** z `docs/github_context.md`
+3. **Implementacja** zgodnie z milestone'ami
+4. **Aktualizacja statusów** issues na GitHub
+5. **Synchronizacja** przed następną sesją
+
+---
+
+## AWS Deployment & DevOps Learning
+
+### Architektura AWS (Free Tier):
+- **EC2 t2.micro**: Serwer aplikacji (750h/miesiąc przez 12 miesięcy)
+- **RDS db.t2.micro**: Baza danych MySQL (750h/miesiąc przez 12 miesięcy)
+- **Route 53**: DNS ($0.50/miesiąc)
+- **Certificate Manager**: Bezpłatny SSL
+- **CloudWatch**: Monitoring
+
+### Koszt w pierwszym roku: **$0**
+Po roku: ~$21.50/miesiąc
+
+### Ścieżka nauki DevOps:
+1. **Podstawy AWS** (1-2 miesiące): Console, EC2, RDS, VPC, IAM
+2. **Infrastructure as Code** (2-3 miesiące): CloudFormation, Terraform
+3. **CI/CD** (3-4 miesiące): CodePipeline, GitHub Actions, Docker
+4. **Advanced** (4-6 miesięcy): Monitoring, Auto Scaling, Security
+
+### Pliki deployment:
+- `docs/aws_deployment_plan.md` - Kompletny plan deploymentu
+- `docs/pre_deployment_checklist.md` - Checklist przed każdym wdrożeniem
+
 ---
 
 **Pamiętaj**: Zawsze aktualizuj dokumentację po wprowadzeniu zmian!
@@ -159,3 +290,4 @@ docs/
 - Stwórz specyfikacje techniczne w stylu `docs/ai_recurring_expenses_spec.md`
 - Zaktualizuj `.cursorrules` przy zmianach architektury
 - Dodaj reguły kodowania do `.cursor/rules.md`
+- Synchronizuj z GitHub przed każdą sesją pracy: `./scripts/github_sync.sh sync`

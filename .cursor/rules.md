@@ -195,22 +195,36 @@ class ExpenseServiceTest extends TestCase
 }
 ```
 
-## Workflow developmentu
+## Git Workflow
 
-### Dodawanie nowej funkcji:
-1. **Entity** - dodaj pola/migrację
-2. **Repository** - metody dostępu do danych
-3. **Service** - logika biznesowa
-4. **Controller** - endpoint HTTP
-5. **Template** - interfejs użytkownika
-6. **Testy** - pokrycie kodu
+### Nazewnictwo branchy:
+- **Format**: `{numer-issue}-{tytuł-issue}`
+- **Przykłady**:
+  - `123-add-user-authentication`
+  - `45-fix-payment-status-bug`
+  - `67-update-expense-validation`
 
 ### Commit message format:
-```
-feat: add recurring expenses functionality
-fix: resolve payment status update bug
-docs: update API documentation
-```
+- **Nagłówek**: taki sam jak nazwa brancha (bez numeru issue jeśli nie dotyczy)
+- **Przykłady**:
+  ```
+  123-add-user-authentication
+
+  Implement user authentication system with login/logout
+  - Add User entity with password hashing
+  - Create security configuration
+  - Add login/logout forms
+  ```
+
+### Dodawanie nowej funkcji:
+1. **Utwórz branch** zgodnie z konwencją nazewnictwa
+2. **Entity** - dodaj pola/migrację
+3. **Repository** - metody dostępu do danych
+4. **Service** - logika biznesowa
+5. **Controller** - endpoint HTTP
+6. **Template** - interfejs użytkownika
+7. **Testy** - pokrycie kodu
+8. **Commit** z tytułem takim jak branch
 
 ## Wydajność
 
