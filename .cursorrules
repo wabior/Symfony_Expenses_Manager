@@ -1,0 +1,55 @@
+# Cursor Rules - Symfony Expenses Manager
+
+## Project Overview
+- **Framework**: Symfony 6.x/7.x (PHP 8.1+)
+- **Database**: MySQL 8.0 with Doctrine ORM
+- **Frontend**: Twig templates + Tailwind CSS + JavaScript
+- **Architecture**: MVC with Service layer
+- **Purpose**: Personal expense tracking with recurring expenses
+
+## Code Style & Conventions
+- **PHP**: PSR-12 standards, type hints, attributes over annotations
+- **Naming**: camelCase for methods/variables, PascalCase for classes
+- **Files**: One class per file, lowercase filenames with underscores
+- **SQL**: Uppercase keywords, meaningful table/column names
+
+## Key Directories Structure
+```
+symfony/
+├── src/
+│   ├── Controller/     # HTTP request handlers
+│   ├── Entity/         # Doctrine entities
+│   ├── Repository/     # Data access layer
+│   ├── Service/        # Business logic
+│   └── Form/           # Symfony forms (if added)
+├── templates/          # Twig views
+├── config/            # Symfony configuration
+└── migrations/        # Database schema changes
+
+docs/                  # AI documentation (see docs/README_for_AI.md)
+```
+
+## Important Rules
+- Always use dependency injection in controllers/services
+- Validate data in forms and controllers
+- Use flash messages for user feedback
+- Handle exceptions properly
+- Write meaningful commit messages
+
+## Database Schema
+- **Users**: Authentication system
+- **Categories**: Expense categorization
+- **Expenses**: Main expense records
+- **Menu**: Navigation configuration
+
+## Security
+- CSRF protection on all forms
+- Role-based access control
+- Secure password hashing
+- Input validation and sanitization
+
+## Related Documentation
+- `docs/README_for_AI.md` - Documentation index
+- `docs/ai_analysis.md` - Current system analysis
+- `docs/ai_development_plan.md` - Development roadmap
+- `docs/ai_scalability_analysis.md` - Performance considerations
