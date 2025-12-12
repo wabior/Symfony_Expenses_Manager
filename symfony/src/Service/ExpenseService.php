@@ -3,50 +3,93 @@
 namespace App\Service;
 
 use App\Entity\Expense;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ExpenseService
 {
     private EntityManagerInterface $entityManager;
+    private \Symfony\Bundle\SecurityBundle\Security $security;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, Security $security)
     {
         $this->entityManager = $entityManager;
+        $this->security = $security;
+    }
+
+    private function getCurrentUser(): User
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+        if (!$user) {
+            throw new \LogicException('User must be authenticated');
+        }
+        return $user;
     }
 
     public function getAllExpenses(): array
     {
-        return $this->entityManager->getRepository(Expense::class)->findAll();
+        $user = $this->getCurrentUser();
+        return $this->entityManager->getRepository(Expense::class)->findByUser($user);
     }
 
     public function getExpensesByMonth(int $year, int $month): array
     {
         $startDate = new \DateTime("$year-$month-01");
         $endDate = (clone $startDate)->modify('+1 month');
+        $user = $this->getCurrentUser();
 
-        return $this->entityManager->getRepository(Expense::class)->findByMonth($startDate, $endDate);
+        return $this->entityManager->getRepository(Expense::class)->findByMonth($startDate, $endDate, $user);
     }
 
     public function addExpense(Request $request): void
     {
+        // Basic validation
+        $name = trim($request->request->get('name', ''));
+        $amount = $request->request->get('amount');
+        $date = $request->request->get('date');
+        $paymentStatus = $request->request->get('paymentStatus');
+        $categoryId = $request->request->get('category');
+
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Expense name is required');
+        }
+
+        if (empty($amount) || !is_numeric($amount) || $amount <= 0) {
+            throw new \InvalidArgumentException('Valid amount is required');
+        }
+
+        if (empty($date)) {
+            throw new \InvalidArgumentException('Date is required');
+        }
+
+        if (empty($paymentStatus) || !in_array($paymentStatus, ['unpaid', 'paid', 'partially_paid'])) {
+            throw new \InvalidArgumentException('Valid payment status is required');
+        }
+
+        if (empty($categoryId)) {
+            throw new \InvalidArgumentException('Category is required');
+        }
+
         $expense = new Expense();
-        $expense->setName($request->request->get('name'));
-        $expense->setAmount($request->request->get('amount'));
-        $expense->setDate(new \DateTime($request->request->get('date')));
-        $expense->setPaymentStatus($request->request->get('paymentStatus'));
+        $expense->setName($name);
+        $expense->setAmount($amount);
+        $expense->setDate(new \DateTime($date));
+        $expense->setPaymentStatus($paymentStatus);
+        $expense->setUser($this->getCurrentUser());
 
         if ($paymentDate = $request->request->get('paymentDate')) {
             $expense->setPaymentDate(new \DateTime($paymentDate));
         }
 
-        if ($categoryId = $request->request->get('category')) {
-            $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
-            if ($category) {
-                $expense->setCategory($category);
-            }
+        $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
+        if (!$category) {
+            throw new \InvalidArgumentException('Invalid category selected');
         }
+        $expense->setCategory($category);
 
         $this->entityManager->persist($expense);
         $this->entityManager->flush();
@@ -55,8 +98,9 @@ class ExpenseService
     public function updateExpenseStatus(int $id, string $status): ?Expense
     {
         $expense = $this->entityManager->getRepository(Expense::class)->find($id);
+        $user = $this->getCurrentUser();
 
-        if ($expense) {
+        if ($expense && $expense->getUser() === $user) {
             $expense->setPaymentStatus($status);
 
             if ($status !== 'unpaid') {

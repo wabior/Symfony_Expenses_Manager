@@ -24,8 +24,8 @@ class ExpenseController extends BaseController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/expenses/{year}/{month}', name: 'expenses', defaults: ['year' => null, 'month' => null])]
-    public function index(Request $request, ?int $year = null, ?int $month = null): Response
+    #[Route('/expenses/{year}/{month}', name: 'expenses', defaults: ['year' => null, 'month' => null], requirements: ['year' => '\d+', 'month' => '\d+'])]
+    public function index(Request $request, ?string $year = null, ?string $month = null): Response
     {
         // Default to current month if no params provided
         if ($year === null || $month === null) {
@@ -36,9 +36,12 @@ class ExpenseController extends BaseController
             ]);
         }
 
-        $expenses = $this->expenseService->getExpensesByMonth($year, $month);
+        $yearInt = $year !== null ? (int) $year : null;
+        $monthInt = $month !== null ? (int) $month : null;
+
+        $expenses = $this->expenseService->getExpensesByMonth($yearInt, $monthInt);
         $categories = $this->expenseService->getAllCategories();
-        $navigation = $this->expenseService->getNavigationMonths($year, $month);
+        $navigation = $this->expenseService->getNavigationMonths($yearInt, $monthInt);
 
         return $this->renderWithRoutes('expenses/index.html.twig', [
             'expenses' => $expenses,
@@ -57,12 +60,18 @@ class ExpenseController extends BaseController
     public function add(Request $request): Response
     {
         if ($request->isMethod('POST')) {
-            $this->expenseService->addExpense($request);
-            $now = new \DateTime();
-            return $this->redirectToRoute('expenses', [
-                'year' => $now->format('Y'),
-                'month' => $now->format('n')
-            ]);
+            try {
+                $this->expenseService->addExpense($request);
+                $now = new \DateTime();
+                return $this->redirectToRoute('expenses', [
+                    'year' => $now->format('Y'),
+                    'month' => $now->format('n')
+                ]);
+            } catch (\Exception $e) {
+                // Handle error - could add flash message or log error
+                // For now, redirect back with error
+                return $this->redirectToRoute('expenses_add');
+            }
         }
 
         $categories = $this->expenseService->getAllCategories();
