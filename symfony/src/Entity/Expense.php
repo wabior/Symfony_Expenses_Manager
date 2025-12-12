@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: "App\Repository\ExpenseRepository")]
 #[ORM\HasLifecycleCallbacks]
@@ -29,6 +30,10 @@ class Expense
     #[ORM\Column(type: "string", length: 20, nullable: false, options: ["default" => "unpaid"])]
     #[Assert\Choice(choices: ["unpaid", "paid", "partially_paid"], message: "Choose a valid payment status.")]
     private $paymentStatus = 'unpaid';
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -112,6 +117,17 @@ class Expense
     public function setPaymentStatus(string $paymentStatus): self
     {
         $this->paymentStatus = $paymentStatus;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
         return $this;
     }
 

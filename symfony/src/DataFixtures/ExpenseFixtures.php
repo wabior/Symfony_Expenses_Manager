@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Expense;
 use App\Entity\Category;
+use App\Entity\User;
 use Faker\Factory;
 
 class ExpenseFixtures extends Fixture
@@ -16,10 +17,14 @@ class ExpenseFixtures extends Fixture
 
         // Pobranie kategorii z bazy danych
         $categories = $manager->getRepository(Category::class)->findAll();
+        $users = $manager->getRepository(User::class)->findAll();
 
-        // Upewnij się, że są dostępne kategorie
+        // Upewnij się, że są dostępne kategorie i użytkownicy
         if (empty($categories)) {
             throw new \Exception('No categories found. Please load CategoryFixtures first.');
+        }
+        if (empty($users)) {
+            throw new \Exception('No users found. Please load UserFixtures first.');
         }
 
         // Definiowanie większej liczby nazw wydatków dla różnych kategorii
@@ -38,6 +43,7 @@ class ExpenseFixtures extends Fixture
         // Dodanie 100 wydatków
         for ($i = 0; $i < 100; $i++) {
             $category = $faker->randomElement($categories);
+            $user = $faker->randomElement($users);
             $expense = new Expense();
             $expense->setName($faker->randomElement($expenseNames[$category->getNamePolish()]));
             $expense->setAmount($faker->randomFloat(2, 10, 1000));
@@ -45,6 +51,7 @@ class ExpenseFixtures extends Fixture
             $expense->setPaymentDate($faker->optional()->dateTimeBetween('-6 months', 'now'));
             $expense->setPaymentStatus($faker->randomElement(['unpaid', 'paid', 'partially_paid']));
             $expense->setCategory($category);
+            $expense->setUser($user);
             $manager->persist($expense);
         }
 
