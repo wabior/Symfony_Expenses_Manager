@@ -213,14 +213,21 @@ class ExpenseService
         $createdOccurrences = [];
 
         foreach ($recurringExpenses as $expense) {
-            // Sprawdź czy wystąpienie już istnieje dla tego wydatku w tym miesiącu
-            $existing = $this->entityManager->getRepository(ExpenseOccurrence::class)
-                ->findByExpenseAndDateRange($expense, $monthStart, $monthEnd);
+                // Sprawdź czy wydatek powinien wystąpić w tym miesiącu zgodnie z cyklem
+            $expenseCreationDate = $expense->getDate();
+            $creationYear = (int) $expenseCreationDate->format('Y');
+            $creationMonth = (int) $expenseCreationDate->format('n');
 
-            if (empty($existing)) {
-                $occurrence = $this->createExpenseOccurrence($expense, $monthStart);
-                $this->entityManager->persist($occurrence);
-                $createdOccurrences[] = $occurrence;
+            if ($this->shouldExpenseOccurInMonth($expense, $creationYear, $creationMonth, $year, $month)) {
+                // Sprawdź czy wystąpienie już istnieje dla tego wydatku w tym miesiącu
+                $existing = $this->entityManager->getRepository(ExpenseOccurrence::class)
+                    ->findByExpenseAndDateRange($expense, $monthStart, $monthEnd);
+
+                if (empty($existing)) {
+                    $occurrence = $this->createExpenseOccurrence($expense, $monthStart);
+                    $this->entityManager->persist($occurrence);
+                    $createdOccurrences[] = $occurrence;
+                }
             }
         }
 
