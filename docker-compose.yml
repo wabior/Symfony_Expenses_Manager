@@ -7,7 +7,7 @@ services:
     volumes:
       - ./symfony:/var/www/html/symfony
       - ./vhost.conf:/etc/apache2/sites-available/000-default.conf
-#      - ./php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php/99-session-config.ini:/usr/local/etc/php/conf.d/99-session-config.ini
     ports:
       - "8000:80"
     depends_on:
