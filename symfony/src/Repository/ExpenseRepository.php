@@ -41,4 +41,35 @@ class ExpenseRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Znajduje wszystkie wydatki cykliczne dla użytkownika
+     */
+    public function findRecurringExpenses(User $user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.recurringFrequency > :frequency')
+            ->andWhere('e.user = :user')
+            ->setParameter('frequency', 0)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Znajduje wydatki cykliczne z wystąpieniami w danym miesiącu
+     */
+    public function findRecurringExpensesForMonth(int $year, int $month, User $user): array
+    {
+        $startDate = new \DateTime("$year-$month-01");
+        $endDate = (clone $startDate)->modify('+1 month -1 day');
+
+        return $this->createQueryBuilder('e')
+            ->where('e.recurringFrequency > :frequency')
+            ->andWhere('e.user = :user')
+            ->setParameter('frequency', 0)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

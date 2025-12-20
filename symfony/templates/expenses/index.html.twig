@@ -23,50 +23,74 @@
                 </a>
             </div>
 
-            <a href="{{ path('expenses_add') }}"
-               class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                Add New Expense
-            </a>
+            <div class="flex space-x-4">
+                <form action="{{ path('expenses_import_recurring', { year: year, month: month }) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('import_recurring') }}">
+                    <button type="submit"
+                            class="inline-block w-auto bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded shadow-md"
+                            onclick="return confirm('Czy na pewno chcesz zaimportować wydatki cykliczne do bieżącego miesiąca?')">
+                        📥 Importuj wydatki cykliczne
+                    </button>
+                </form>
+
+                <a href="{{ path('expenses_add') }}"
+                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    Add New Expense
+                </a>
+            </div>
         </nav>
 
         <div class="table-container">
             <table class="min-w-full leading-normal">
                 <thead>
                 <tr class="border-t">
-                    {% set headers = ['ID', 'Name', 'Cost', 'Date', 'Payment Date', 'Category', 'Status'] %}
+                    {% set headers = ['Date', 'Name', 'Cost', 'Category', 'Status'] %}
                     {% for header in headers %}
                         <th class="table-header">{{ header }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
-                {% for expense in expenses %}
-                    <tr id="expense-{{ expense.id }}">
-                        {% set fields = {
-                            id: expense.id,
-                            name: expense.name,
-                            amount: expense.amount,
-                            date: expense.date|date('Y-m-d'),
-                            paymentDate: expense.paymentDate ? expense.paymentDate|date('Y-m-d') : 'N/A',
-                            category: expense.category.nameEnglish
-                        } %}
-                        {% for key, value in fields %}
-                            <td class="table-cell"{% if key == 'paymentDate' %} data-key="paymentDate"{% endif %}>
-                                {{ value }}
-                            </td>
-                        {% endfor %}
-                        <td class="table-cell status-cell cursor-pointer relative" data-id="{{ expense.id }}">
+                {% for item in expenses %}
+                    {% set isOccurrence = item.expense is defined %}
+                    {% set expense = isOccurrence ? item.expense : item %}
+                    {% set itemId = isOccurrence ? item.id : expense.id %}
+                    {% set itemDate = isOccurrence ? item.occurrenceDate : expense.date %}
+                    {% set itemStatus = isOccurrence ? item.paymentStatus : expense.paymentStatus %}
+
+                    <tr id="{% if isOccurrence %}occurrence-{{ itemId }}{% else %}expense-{{ itemId }}{% endif %}"{% if expense.isRecurring %} class="recurring-expense"{% endif %}>
+                        <td class="table-cell">
+                            {{ itemDate|date('d.m.Y') }}
+                        </td>
+                        <td class="table-cell">
+                            {{ expense.name }}
+                        </td>
+                        <td class="table-cell">
+                            {{ expense.amount|number_format(2, ',', ' ') }} zł
+                        </td>
+                        <td class="table-cell">
+                            {% if expense.category %}
+                                {{ expense.category.namePolish }}
+                            {% else %}
+                                Brak kategorii
+                            {% endif %}
+                        </td>
+                        <td class="table-cell status-cell cursor-pointer relative" data-id="{{ itemId }}" data-type="{% if isOccurrence %}occurrence{% else %}expense{% endif %}">
                             <span class="status-text hover:text-shadow
-                                {% if expense.paymentStatus == 'unpaid'%} text-red-500 {% endif %}
-                                {% if expense.paymentStatus == 'paid'%} text-green-600 {% endif %}
+                                {% if itemStatus == 'unpaid'%} text-red-500 {% endif %}
+                                {% if itemStatus == 'paid'%} text-green-600 {% endif %}
+                                {% if itemStatus == 'partially_paid'%} text-yellow-600 {% endif %}
                             ">
-                                {{ expense.paymentStatus|capitalize }}
+                                {{ itemStatus|capitalize }}
                             </span>
+                            {% if expense.isRecurring %}
+                                <span class="recurring-indicator ml-2 text-sm opacity-70" title="Cykl: co {{ expense.recurringFrequency }} {% if expense.recurringFrequency == 1 %}miesiąc{% else %}miesięcy{% endif %}">🔄{{ expense.recurringFrequency }}</span>
+                            {% endif %}
                             <select class="status-select absolute right-2 top-2 p-1 hidden w-full cursor-pointer">
-                                {% set statuses = ['unpaid', 'paid'] %}
+                                {% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
                                 {% for status in statuses %}
-                                    <option value="{{ status }}" {% if expense.paymentStatus == status %}selected{% endif %}>
-                                        {{ status|capitalize }}
+                                    <option value="{{ status }}" {% if itemStatus == status %}selected{% endif %}>
+                                        {{ status|replace({'_': ' '})|title }}
                                     </option>
                                 {% endfor %}
                             </select>

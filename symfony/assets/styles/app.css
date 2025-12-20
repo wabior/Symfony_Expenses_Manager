@@ -33,3 +33,17 @@
 .hover\:text-shadow:hover {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
+
+/* Style dla wydatków cyklicznych */
+.recurring-expense {
+    @apply bg-blue-50 border-l-4 border-blue-400;
+}
+
+.recurring-indicator {
+    @apply ml-2 text-sm opacity-70 cursor-help;
+    transition: opacity 0.2s;
+}
+
+.recurring-indicator:hover {
+    @apply opacity-100;
+}

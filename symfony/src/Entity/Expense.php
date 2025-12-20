@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\User;
 
@@ -44,6 +46,17 @@ class Expense
 
     #[ORM\Column(type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $updatedAt;
+
+    #[ORM\Column(type: "integer", options: ["default" => 0])]
+    private $recurringFrequency = 0;
+
+    #[ORM\OneToMany(mappedBy: "expense", targetEntity: ExpenseOccurrence::class, cascade: ["persist", "remove"])]
+    private $occurrences;
+
+    public function __construct()
+    {
+        $this->occurrences = new ArrayCollection();
+    }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -139,6 +152,49 @@ class Expense
     public function setCategory(Category $category): self
     {
         $this->category = $category;
+        return $this;
+    }
+
+    public function getRecurringFrequency(): ?int
+    {
+        return $this->recurringFrequency;
+    }
+
+    public function setRecurringFrequency(int $recurringFrequency): self
+    {
+        $this->recurringFrequency = $recurringFrequency;
+        return $this;
+    }
+
+    public function isRecurring(): bool
+    {
+        return $this->recurringFrequency > 0;
+    }
+
+    public function getOccurrences()
+    {
+        return $this->occurrences;
+    }
+
+    public function addOccurrence(ExpenseOccurrence $occurrence): self
+    {
+        if (!$this->occurrences->contains($occurrence)) {
+            $this->occurrences[] = $occurrence;
+            $occurrence->setExpense($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOccurrence(ExpenseOccurrence $occurrence): self
+    {
+        if ($this->occurrences->removeElement($occurrence)) {
+            // set the owning side to null (unless already changed)
+            if ($occurrence->getExpense() === $this) {
+                $occurrence->setExpense(null);
+            }
+        }
+
         return $this;
     }
 }
