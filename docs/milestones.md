@@ -4,13 +4,13 @@
 
 Ten dokument zawiera kluczowe milestone'y rozwoju aplikacji, które definiują główne etapy dostarczania wartości biznesowej użytkownikom. Każdy milestone reprezentuje znaczący postęp w funkcjonalności aplikacji.
 
-**Aktualny status**: Żaden milestone nie został jeszcze ukończony. Aplikacja znajduje się w fazie podstawowej funkcjonalności.
+**Aktualny status**: Milestone 1 został ukończony ✅. Aplikacja posiada bezpieczne zarządzanie wydatkami z izolacją danych między użytkownikami.
 
 ## Milestone'y
 
 ### 1. Secure Multi-User Expense Management
 
-**Status**: Nie rozpoczęty
+**Status**: Zakończony ✅
 **Priorytet**: Krytyczny (Bezpieczeństwo)
 
 #### Opis
@@ -197,4 +197,4 @@ Zaawansowane funkcje zapewniające kompletność aplikacji i przygotowanie na pr
 Ten dokument należy aktualizować przy każdej zmianie statusu milestone'ów lub dodaniu nowych zadań.
 
 **Ostatnia aktualizacja**: Grudzień 2025
-**Status**: Wszystkie milestone'y w trakcie planowania
+**Status**: Milestone 1 ukończony ✅, pozostałe w trakcie planowania
