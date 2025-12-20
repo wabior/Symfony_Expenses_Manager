@@ -76,7 +76,7 @@ class RegistrationController extends BaseController
             if (empty($errors)) {
                 $user = new User();
                 $user->setEmail($email);
-                $user->setRoles([]); // Will get ROLE_USER from getRoles() method
+                $user->setRoles(null); // NULL means default roles will be applied
 
                 // Hash the password
                 $hashedPassword = $passwordHasher->hashPassword($user, $password);
