@@ -39,7 +39,7 @@ class UserFixtures extends Fixture
         // Create regular user
         $user = new User();
         $user->setEmail('user@example.com');
-        $user->setRoles(['ROLE_USER']);
+        $user->setRoles(null); // NULL means default roles will be applied
         $user->setPassword($this->passwordHasher->hashPassword($user, 'user123'));
 
         $manager->persist($user);
