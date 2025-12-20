@@ -187,10 +187,9 @@ CREATE TABLE menu (
 ## Rozszerzenia planowane
 
 ### Version 2.0 - Wydatki cykliczne
-**Nowe pola w Expense**:
-- `is_recurring` (boolean)
-- `recurring_frequency` (string)
-- `parent_expense_id` (int, self-reference)
+**Nowe encje**:
+- `Expense`: definicja wydatku z polem `recurring_frequency` (int, 0-12)
+- `ExpenseOccurrence`: wystąpienia wydatków z datą i statusem płatności
 
 **Nowe funkcjonalności**:
 - Checkbox przy dodawaniu wydatku

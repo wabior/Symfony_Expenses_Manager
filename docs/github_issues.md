@@ -180,11 +180,11 @@ Implement recurring expenses functionality allowing users to create expenses tha
 
 #### Requirements:
 - Add recurring frequency field to expense form (1, 2, 3, 6, 12 months)
-- Add "Create Next Month" functionality to copy unpaid recurring expenses
+- Add "Create Next Month" functionality to create occurrences for recurring expenses
 - Add visual indicators for recurring expenses
-- Implement parent-child relationship for recurring expenses
-- Add database fields: recurring_frequency, parent_expense_id
-- Update expense queries to handle recurring logic
+- Implement Expense and ExpenseOccurrence entities
+- Add database tables: expense (definitions), expense_occurrence (instances)
+- Update queries to work with occurrence-based approach
 
 #### Acceptance Criteria:
 - Users can mark expenses as recurring
@@ -194,9 +194,11 @@ Implement recurring expenses functionality allowing users to create expenses tha
 - Users can modify recurring settings
 
 #### Technical Notes:
-- Add database migration for new fields
-- Update Expense entity with self-referencing relationship
-- Modify ExpenseService, ExpenseRepository
+- Create ExpenseOccurrence entity for expense instances
+- Update Expense entity with recurring_frequency field
+- Add ExpenseOccurrenceRepository for occurrence queries
+- Modify ExpenseService to work with occurrences
+- Implement occurrence-based queries and displays
 - Update forms and templates
 - Add proper validation
 
