@@ -17,9 +17,9 @@ Ten plik zawiera listę wszystkich zadań (issues) do zaimplementowania w aplika
 
 ### User-Expense Relationship & Security
 
-**Status**: Nie rozpoczęty
+**Status**: Zakończony ✅
 **Priorytet**: Krytyczny (Bezpieczeństwo)
-**Assignee**: TBD
+**Assignee**: Completed
 
 #### Description
 Implement user-specific expense management by adding user relationship to expenses and enforcing row-level security. This is a critical security and functionality requirement - currently all users can see all expenses in the system.
