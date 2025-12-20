@@ -20,20 +20,41 @@ Aplikacja umożliwia podstawowe zarządzanie wydatkami miesięcznymi z następuj
 
 #### Zmiany w bazie danych:
 ```sql
-ALTER TABLE expense ADD COLUMN is_recurring TINYINT(1) DEFAULT 0 NOT NULL;
-ALTER TABLE expense ADD COLUMN recurring_frequency VARCHAR(20) DEFAULT NULL; -- 'monthly', 'quarterly', 'yearly'
-ALTER TABLE expense ADD COLUMN parent_expense_id INT DEFAULT NULL;
-ALTER TABLE expense ADD CONSTRAINT FK_PARENT_EXPENSE FOREIGN KEY (parent_expense_id) REFERENCES expense(id);
+-- Tabela definicji wydatków cyklicznych
+CREATE TABLE expense (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    recurring_frequency INT DEFAULT 0 NOT NULL COMMENT '0=jednorazowy, 1-12=miesięczny cykl',
+    category_id INT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES category(id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+-- Tabela wystąpień wydatków (unika duplikacji danych)
+CREATE TABLE expense_occurrence (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    expense_id INT NOT NULL,
+    occurrence_date DATE NOT NULL,
+    payment_status VARCHAR(20) DEFAULT 'unpaid',
+    payment_date DATE NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (expense_id) REFERENCES expense(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_expense_date (expense_id, occurrence_date)
+);
 ```
 
-#### Zmiany w encji Expense:
-- Dodanie pól: `isRecurring`, `recurringFrequency`, `parentExpense`
-- Relacja Self-referencing: `parentExpense` (Many-to-One)
+#### Zmiany w encjach:
+- **Expense**: definicja wydatku cyklicznego z polem `recurringFrequency` (int)
+- **ExpenseOccurrence**: wystąpienia wydatków z datą, statusem płatności
+- Relacja: Expense -> ExpenseOccurrence (One-to-Many)
 
 #### Nowe metody w ExpenseService:
-- `createRecurringExpense(Expense $template, int $year, int $month)`
-- `getRecurringExpensesByMonth(int $year, int $month)`
-- `copyUnpaidRecurringToNextMonth(int $currentYear, int $currentMonth)`
+- `createExpenseOccurrence(Expense $expense, \DateTimeInterface $date)`
+- `getExpenseOccurrencesByMonth(int $year, int $month)`
+- `createNextMonth(int $year, int $month)` - tworzy wystąpienia dla wydatków cyklicznych
 
 ### 2. Tworzenie nowego miesiąca (Month Creation)
 
@@ -52,7 +73,7 @@ ALTER TABLE expense ADD CONSTRAINT FK_PARENT_EXPENSE FOREIGN KEY (parent_expense
 #### Nowe metody w ExpenseService:
 - `createNextMonth(int $fromYear, int $fromMonth, array $selectedExpenseIds = null)`
 - `getUnpaidRecurringExpenses(int $year, int $month)`
-- `duplicateExpenseForNextMonth(Expense $expense, int $targetYear, int $targetMonth)`
+- `createExpenseOccurrence(Expense $expense, \DateTimeInterface $date)`
 
 ### 3. Usprawnienia UI/UX
 
