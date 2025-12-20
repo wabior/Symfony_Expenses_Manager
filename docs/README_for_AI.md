@@ -13,11 +13,11 @@ docs/
 ├── milestones.md                       # Kluczowe milestone'y rozwoju
 ├── github_issues.md                    # Szczegółowa lista zadań GitHub
 ├── github_context.md                   # Aktualny stan issues z GitHub (auto-generated)
-├── ai_analysis.md                      # Pełna analiza aplikacji
+├── ai_project_overview.md              # Analiza aplikacji i struktura projektu
 ├── ai_development_plan.md              # Plan rozwoju na przyszłość
-├── ai_recurring_expenses_spec.md       # Specyfikacja wydatków cyklicznych
-├── ai_scalability_analysis.md          # Analiza skalowalności i wydajności
-└── ai_project_structure.md             # Struktura projektu - podsumowanie
+├── ai_recurring_expenses_spec.md       # Specyfikacja wydatków cyklicznych (ze skalowalnością)
+├── aws_deployment_plan.md              # Plan deploymentu na AWS
+└── pre_deployment_checklist.md         # Checklist przed wdrożeniem
 ```
 
 ### Narzędzia CLI w `scripts/`:
@@ -37,9 +37,9 @@ scripts/
 4. **Zobacz `docs/github_issues.md`** - szczegółowa lista wszystkich zadań do wykonania
 5. **Zsynchronizuj z GitHub**: `./scripts/github_sync.sh sync` - pobierz aktualny stan issues
 6. **Zobacz `docs/github_context.md`** - aktualny stan issues z GitHub (po synchronizacji)
-7. **Zobacz `docs/ai_analysis.md`** - zrozumienie aktualnego stanu aplikacji
+7. **Zobacz `docs/ai_project_overview.md`** - zrozumienie aktualnego stanu aplikacji i struktury
 8. **Sprawdź `docs/ai_development_plan.md`** - czy nowa funkcja jest już zaplanowana
-9. **Zobacz `docs/ai_project_structure.md`** - szybkie przypomnienie struktury
+9. **Zobacz `docs/ai_recurring_expenses_spec.md`** - specyfikacja wydatków cyklicznych (w tym analiza skalowalności)
 
 ### Dla konkretnych zadań:
 
@@ -52,8 +52,7 @@ scripts/
 - Zawiera analizę różnych podejść i rekomendacje
 
 #### Modyfikacja istniejących funkcji:
-- Zacznij od `docs/ai_project_structure.md` - znajdź odpowiednie pliki
-- Sprawdź `docs/ai_analysis.md` dla szczegółów implementacji
+- Zacznij od `docs/ai_project_overview.md` - znajdź odpowiednie pliki i szczegóły implementacji
 
 #### Nowe funkcje nieujęte w planie:
 - Dodaj opis do `docs/ai_development_plan.md`
@@ -176,7 +175,7 @@ Zobacz `docs/milestones.md` dla szczegółowych opisów i statusu.
 ## Checklist przed implementacją
 
 - [ ] Przeczytano `.cursorrules` i `.cursor/rules.md`
-- [ ] Sprawdzono `docs/ai_analysis.md` - aktualny stan systemu
+- [ ] Sprawdzono `docs/ai_project_overview.md` - aktualny stan systemu i struktura
 - [ ] Sprawdzono `docs/ai_development_plan.md` - czy funkcja jest zaplanowana
 - [ ] Przeczytano odpowiednią dokumentację techniczną
 - [ ] Zrozumiano aktualną strukturę projektu
