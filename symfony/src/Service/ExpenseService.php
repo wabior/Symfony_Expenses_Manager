@@ -213,7 +213,7 @@ class ExpenseService
         $createdOccurrences = [];
 
         foreach ($recurringExpenses as $expense) {
-                // Sprawdź czy wydatek powinien wystąpić w tym miesiącu zgodnie z cyklem
+            // Sprawdź czy wydatek powinien wystąpić w tym miesiącu zgodnie z cyklem
             $expenseCreationDate = $expense->getDate();
             $creationYear = (int) $expenseCreationDate->format('Y');
             $creationMonth = (int) $expenseCreationDate->format('n');
