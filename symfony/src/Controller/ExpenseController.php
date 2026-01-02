@@ -39,7 +39,7 @@ class ExpenseController extends BaseController
         $yearInt = $year !== null ? (int) $year : null;
         $monthInt = $month !== null ? (int) $month : null;
 
-        $expenses = $this->expenseService->getExpensesByMonth($yearInt, $monthInt);
+        $expenses = $this->expenseService->getExpenseOccurrencesByMonth($yearInt, $monthInt);
         $categories = $this->expenseService->getAllCategories();
         $navigation = $this->expenseService->getNavigationMonths($yearInt, $monthInt);
 
@@ -88,7 +88,7 @@ class ExpenseController extends BaseController
         $data = json_decode($request->getContent(), true);
         $status = $data['status'] ?? null;
 
-        if (!$status || !in_array($status, ['unpaid', 'paid'])) {
+        if (!$status || !in_array($status, ['unpaid', 'paid', 'partially_paid'])) {
             return new JsonResponse(['success' => false], 400);
         }
 
@@ -102,5 +102,42 @@ class ExpenseController extends BaseController
         }
 
         return new JsonResponse(['success' => false], 404);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/expenses/import-recurring/{year}/{month}', name: 'expenses_import_recurring', methods: ['POST'])]
+    public function importRecurringExpenses(int $year, int $month): Response
+    {
+        try {
+            $createdOccurrences = $this->expenseService->createOccurrencesForMonth($year, $month);
+
+            $this->addFlash('success', sprintf('Zaimportowano %d wystąpień wydatków cyklicznych do bieżącego miesiąca', count($createdOccurrences)));
+
+            // Pozostajemy w tym samym miesiącu
+            return $this->redirectToRoute('expenses', ['year' => $year, 'month' => $month]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Wystąpił błąd podczas importowania wydatków cyklicznych: ' . $e->getMessage());
+            return $this->redirectToRoute('expenses', ['year' => $year, 'month' => $month]);
+        }
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/expenses/occurrence/{id}/status', name: 'expenses_update_occurrence_status', methods: ['POST'])]
+    public function updateOccurrenceStatus(int $id, Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            $status = $data['status'] ?? null;
+
+            if (!$status || !in_array($status, ['unpaid', 'paid', 'partially_paid'])) {
+                return new JsonResponse(['success' => false, 'error' => 'Invalid status'], 400);
+            }
+
+            $this->expenseService->updateOccurrencePaymentStatus($id, $status);
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+        }
     }
 }

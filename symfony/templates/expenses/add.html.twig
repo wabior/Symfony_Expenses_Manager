@@ -38,6 +38,19 @@
                 </select>
             </div>
             <div>
+                <label for="recurringFrequency" class="block text-lg font-semibold text-gray-800">Cykl powtarzania:</label>
+                <select id="recurringFrequency" name="recurringFrequency" class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
+                    <option value="0">Nie powtarza się</option>
+                    <option value="1">Co 1 miesiąc</option>
+                    <option value="2">Co 2 miesiące</option>
+                    <option value="3">Co 3 miesiące</option>
+                    <option value="4">Co 4 miesiące</option>
+                    <option value="6">Co 6 miesięcy</option>
+                    <option value="12">Co 12 miesięcy</option>
+                </select>
+                <p class="text-sm text-gray-600 mt-1">Wydatki z cyklem > 0 będą automatycznie dodawane w następnych miesiącach.</p>
+            </div>
+            <div>
                 <label for="paymentDate" class="block text-lg font-semibold text-gray-800">Payment Date:</label>
                 <input type="date" id="paymentDate" name="paymentDate" class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
             </div>
