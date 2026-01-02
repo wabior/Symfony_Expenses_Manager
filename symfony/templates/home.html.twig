@@ -3,122 +3,292 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <div class="container mx-auto my-4 px-4">
-        <div class="bg-white shadow-xl rounded-lg py-6">
-            <div class="block lg:flex lg:items-center lg:justify-between">
-                <div class="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
-                    <h2 class="text-gray-800 text-3xl font-bold mb-2">Welcome to Expense Manager!</h2>
-                    <p class="text-gray-600 text-lg">Manage your expenses efficiently and effortlessly. Get insights into your spending habits and stay on top of your budget.</p>
-                </div>
-                <div class="w-full lg:w-1/2 px-4">
-                    <div class="table-container">
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                            <tr>
-                                <th class="table-header">Item</th>
-                                <th class="table-header">Cost</th>
-                                <th class="table-header">Date</th>
-                                <th class="table-header">Category</th>
-                                <th class="table-header">Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="table-cell">Netflix</td>
-                                <td class="table-cell">$10</td>
-                                <td class="table-cell">Jan 01, 2024</td>
-                                <td class="table-cell">Entertainment</td>
-                                <td class="table-cell status-paid">Paid</td>
-                            </tr>
-                            <tr>
-                                <td class="table-cell">Internet</td>
-                                <td class="table-cell">$25</td>
-                                <td class="table-cell">Jan 01, 2024</td>
-                                <td class="table-cell">Bills</td>
-                                <td class="table-cell status-unpaid">Unpaid</td>
-                            </tr>
-                            <!-- Additional rows with conditions for status -->
-                            <tr>
-                                <td class="table-cell">Mobile</td>
-                                <td class="table-cell">$50</td>
-                                <td class="table-cell">Jan 15, 2024</td>
-                                <td class="table-cell">Bills</td>
-                                <td class="table-cell text-green-500">Paid</td>
-                            </tr>
-
-                            </tbody>
-                        </table>
-
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container mx-auto px-4">
-        <div class="bg-white shadow-xl rounded-lg py-6">
-            <div class="block lg:flex lg:items-center lg:justify-between flex-grow">
-                <!--  card with SVG chart -->
-                <div class="w-full lg:w-1/2 px-4">
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <svg height="250" xmlns="http://www.w3.org/2000/svg" class="rounded border">
-                            <!-- Bars for Chart -->
-                            <rect x="20" y="50" width="50" height="150" fill="#E55451" />
-                            <text x="25" y="45" fill="#000">Bills</text>
-                            <text x="25" y="220" fill="#000">$75</text>
-
-                            <rect x="100" y="80" width="50" height="120" fill="#ecc94b" />
-                            <text x="105" y="75" fill="#000">Food</text>
-                            <text x="105" y="220" fill="#000">$50</text>
-
-                            <rect x="180" y="180" width="50" height="20" fill="#68d391" />
-                            <text x="185" y="170" fill="#000">Entertainment</text>
-                            <text x="185" y="220" fill="#000">$10</text>
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 opacity-90"></div>
+        <div class="relative container mx-auto px-4 py-20">
+            <div class="text-center text-white animate-fade-in-up">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 text-shadow">
+                    Expense Manager
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
+                    Zarządzaj swoimi wydatkami w nowoczesny i efektywny sposób.
+                    Zyskaj wgląd w swoje nawyki wydatkowe i kontroluj budżet.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{{ path('expenses') }}" class="btn-primary text-lg px-8 py-4">
+                        <svg class="w-6 h-6 mr-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
-                        <p class="text-gray-600 text-lg mt-4">
-                            The chart illustrates your monthly expenses across different categories. Monitoring your spending helps in better financial planning and insights into where your money goes each month.
-                        </p>
-                    </div>
-                </div>
-                <!-- Description container -->
-                <div id="dupa" class="w-full lg:w-1/2 p-4 border flex flex-col flex-grow">
-                    <h3 class="text-gray-800 text-xl font-semibold mb-2">Monthly Expense Breakdown</h3>
-                    <p class="text-gray-600 mb-4">Visualize your spending patterns across different categories over the month. Track your budget and manage your finances more effectively.</p>
-                    <h3 class="text-gray-800 text-xl font-semibold mb-2">About Expense Management</h3>
-                    <p class="text-gray-600 mb-4">Managing your expenses effectively helps you to keep financial stress at bay. Our intuitive tools allow you to forecast expenses and monitor transactions in a simple and secure manner. Get actionable insights into your financial habits and make informed decisions that support your financial goals.</p>
+                        Zobacz wydatki
+                    </a>
+                    <a href="{{ path('expenses_add') }}" class="btn-secondary text-lg px-8 py-4">
+                        <svg class="w-6 h-6 mr-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Dodaj wydatek
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container mx-auto pt-8">
-        <h2 class="text-center text-2xl text-gray-800 font-bold mb-6">What Our Users Say</h2>
-        <div class="flex flex-wrap justify-around">
-            <!-- Card 1 -->
-            <div class="w-full md:w-1/3 p-4">
-                <div class="bg-white shadow-lg rounded-lg p-5">
-                    <p class="text-gray-600 italic">"I tell ya what, Expense Manager is a game changer. Keeps all my bills and spendin' straighter than an arrow!"</p>
-                    <div class="mt-4 text-right">
-                        <p class="text-gray-800 font-bold">- Billy Bob, Ranch Owner</p>
+    <!-- Recent Expenses Preview -->
+    <div class="container mx-auto px-4 py-16">
+        <div class="card-modern p-8 animate-fade-in-up">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Najnowsze wydatki</h2>
+                <p class="text-gray-600">Przejrzyj swoje ostatnie transakcje</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                    <tr>
+                        <th class="table-header">Nazwa</th>
+                        <th class="table-header">Kwota</th>
+                        <th class="table-header">Data</th>
+                        <th class="table-header">Kategoria</th>
+                        <th class="table-header">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                        <td class="table-cell">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-pink-500 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="text-white text-xs font-bold">N</span>
+                                </div>
+                                Netflix
+                            </div>
+                        </td>
+                        <td class="table-cell font-semibold text-lg">10 zł</td>
+                        <td class="table-cell">01.01.2024</td>
+                        <td class="table-cell">
+                            <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                                Rozrywka
+                            </span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="status-paid font-semibold">
+                                <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                Opłacony
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                        <td class="table-cell">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="text-white text-xs font-bold">I</span>
+                                </div>
+                                Internet
+                            </div>
+                        </td>
+                        <td class="table-cell font-semibold text-lg">25 zł</td>
+                        <td class="table-cell">01.01.2024</td>
+                        <td class="table-cell">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                Rachunki
+                            </span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="status-unpaid font-semibold">
+                                <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                Nieopłacony
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                        <td class="table-cell">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="text-white text-xs font-bold">M</span>
+                                </div>
+                                Telefon
+                            </div>
+                        </td>
+                        <td class="table-cell font-semibold text-lg">50 zł</td>
+                        <td class="table-cell">15.01.2024</td>
+                        <td class="table-cell">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                Rachunki
+                            </span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="status-paid font-semibold">
+                                <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                Opłacony
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container mx-auto px-4 py-16">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Chart Section -->
+            <div class="card-modern p-8 animate-fade-in-up">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Analiza wydatków</h3>
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl">
+                    <svg height="280" xmlns="http://www.w3.org/2000/svg" class="rounded-lg w-full">
+                        <!-- Background grid -->
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+
+                        <!-- Bars for Chart -->
+                        <rect x="30" y="40" width="60" height="160" fill="url(#gradient-bills)" rx="4"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#374151" font-size="12" font-weight="bold">Rachunki</text>
+                        <text x="60" y="220" text-anchor="middle" fill="#6b7280" font-size="11">75 zł</text>
+
+                        <rect x="120" y="70" width="60" height="130" fill="url(#gradient-food)" rx="4"/>
+                        <text x="150" y="65" text-anchor="middle" fill="#374151" font-size="12" font-weight="bold">Jedzenie</text>
+                        <text x="150" y="220" text-anchor="middle" fill="#6b7280" font-size="11">50 zł</text>
+
+                        <rect x="210" y="170" width="60" height="30" fill="url(#gradient-entertainment)" rx="4"/>
+                        <text x="240" y="165" text-anchor="middle" fill="#374151" font-size="12" font-weight="bold">Rozrywka</text>
+                        <text x="240" y="220" text-anchor="middle" fill="#6b7280" font-size="11">10 zł</text>
+
+                        <!-- Gradients -->
+                        <defs>
+                            <linearGradient id="gradient-bills" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="gradient-food" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="gradient-entertainment" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <p class="text-gray-600 text-center mt-4">
+                    Wykres pokazuje Twoje miesięczne wydatki w różnych kategoriach. Monitorowanie wydatków pomaga w lepszym planowaniu finansowym.
+                </p>
+            </div>
+
+            <!-- Description Section -->
+            <div class="space-y-6 animate-fade-in-up">
+                <div class="card-modern p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Miesięczna analiza wydatków</h3>
                     </div>
+                    <p class="text-gray-600">Wizualizuj swoje wzorce wydatków w różnych kategoriach przez cały miesiąc. Śledź budżet i zarządzaj finansami efektywniej.</p>
+                </div>
+
+                <div class="card-modern p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">O zarządzaniu wydatkami</h3>
+                    </div>
+                    <p class="text-gray-600">Efektywne zarządzanie wydatkami pomaga utrzymać stres finansowy na dystans. Nasze intuicyjne narzędzia pozwalają prognozować wydatki i monitorować transakcje w prosty i bezpieczny sposób.</p>
                 </div>
             </div>
-            <!-- Card 2 -->
-            <div class="w-full md:w-1/3 p-4">
-                <div class="bg-white shadow-lg rounded-lg p-5">
-                    <p class="text-gray-600 italic">"I've saved hours every month since I started using Expense Manager. Highly recommend for anyone looking to simplify their finances."</p>
-                    <div class="mt-4 text-right">
-                        <p class="text-gray-800 font-bold">- John Smith, Entrepreneur</p>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="bg-gradient-to-r from-gray-50 to-blue-50 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12 animate-fade-in-up">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Co mówią nasi użytkownicy</h2>
+                <p class="text-xl text-gray-600">Dołącz do tysięcy zadowolonych użytkowników</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 animate-fade-in-up">
+                <!-- Testimonial 1 -->
+                <div class="card-modern p-6 relative">
+                    <div class="absolute -top-4 left-6">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 italic mb-6">"Expense Manager to prawdziwa rewolucja. Wszystkie moje rachunki są teraz zorganizowane lepiej niż strzała w locie!"</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm font-bold">BB</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 font-bold">Billy Bob</p>
+                                <p class="text-gray-500 text-sm">Właściciel rancza</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="w-full md:w-1/3 p-4">
-                <div class="bg-white shadow-lg rounded-lg p-5">
-                    <p class="text-gray-600 italic">"The insights provided by Expense Manager are invaluable for budget planning. It's a must-have tool for managing personal finances."</p>
-                    <div class="mt-4 text-right">
-                        <p class="text-gray-800 font-bold">- Sarah Lee, Designer</p>
+
+                <!-- Testimonial 2 -->
+                <div class="card-modern p-6 relative">
+                    <div class="absolute -top-4 left-6">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 italic mb-6">"Oszczędzam godziny każdego miesiąca od kiedy używam Expense Manager. Gorąco polecam wszystkim, którzy chcą uprościć swoje finanse."</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm font-bold">JS</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 font-bold">John Smith</p>
+                                <p class="text-gray-500 text-sm">Przedsiębiorca</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="card-modern p-6 relative">
+                    <div class="absolute -top-4 left-6">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p class="text-gray-600 italic mb-6">"Wgląd dostarczany przez Expense Manager jest nieoceniony dla planowania budżetu. To obowiązkowe narzędzie do zarządzania finansami osobistymi."</p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm font-bold">SL</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 font-bold">Sarah Lee</p>
+                                <p class="text-gray-500 text-sm">Projektantka</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
