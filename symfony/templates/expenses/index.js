@@ -41,9 +41,9 @@ document.querySelectorAll('.status-cell').forEach(cell => {
 
                 // Aktualizuj klasy CSS dla koloru
                 statusText.className = `status-text hover:text-shadow ${
-                    newStatus === 'paid' ? 'text-green-600' :
-                    newStatus === 'unpaid' ? 'text-red-500' :
-                    'text-yellow-600'
+                    newStatus === 'paid' ? 'status-paid'
+                        : newStatus === 'unpaid' ? 'status-unpaid'
+                            : 'text-yellow-600'
                 }`;
 
                 // Ukryj select, pokaż tekst

@@ -1,113 +1,186 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Expenses{% endblock %}
+{% block title %}Expenses
+{% endblock %}
 
 {% block content %}
-    <div class="container mx-auto">
-        <h1 class="text-xl font-bold my-4">Expenses</h1>
+	<div
+		class="container mx-auto px-4 py-8 animate-fade-in-up">
+		<!-- Header Section -->
+		<div class="card-modern p-6 mb-8">
+			<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+				<div>
+					<h1 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+						<svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+						</svg>
+						Wydatki
+					</h1>
+					<p class="text-gray-600">Zarządzaj swoimi wydatkami i śledź ich status</p>
+				</div>
 
-        <nav class="flex justify-between items-center mb-4" aria-label="Month navigation">
-            <div class="flex space-x-4">
-                <a href="{{ path('expenses', { year: prevYear, month: prevMonth }) }}"
-                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    &lt; Previous
-                </a>
+				<div class="flex flex-wrap gap-3">
+					<a href="{{ path('expenses_add') }}" class="btn-primary">
+						<svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+						</svg>
+						Dodaj wydatek
+					</a>
+				</div>
+			</div>
+		</div>
 
-                <span class="inline-block w-auto bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded">
-                    {{ month }} - {{ year }}
-                </span>
+		<!-- Navigation and Actions -->
+		<div class="card-modern p-6 mb-6">
+			<div
+				class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+				<!-- Month Navigation -->
+				<div class="flex items-center space-x-3" aria-label="Month navigation">
+					<a href="{{ path('expenses', { year: prevYear, month: prevMonth }) }}" class="btn-outline">
+						<svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+						</svg>
+						Poprzedni
+					</a>
 
-                <a href="{{ path('expenses', { year: nextYear, month: nextMonth }) }}"
-                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    Next &gt;
-                </a>
-            </div>
+					<div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg">
+						{{ month }}
+						-
+						{{ year }}
+					</div>
 
-            <div class="flex space-x-4">
-                <form action="{{ path('expenses_import_recurring', { year: year, month: month }) }}" method="post" style="display: inline;">
-                    <input type="hidden" name="_token" value="{{ csrf_token('import_recurring') }}">
-                    <button type="submit"
-                            class="inline-block w-auto bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded shadow-md"
-                            onclick="return confirm('Czy na pewno chcesz zaimportować wydatki cykliczne do bieżącego miesiąca?')">
-                        📥 Importuj wydatki cykliczne
-                    </button>
-                </form>
+					<a href="{{ path('expenses', { year: nextYear, month: nextMonth }) }}" class="btn-outline">
+						Następny
+						<svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+						</svg>
+					</a>
+				</div>
 
-                <a href="{{ path('expenses_add') }}"
-                   class="inline-block w-auto bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    Add New Expense
-                </a>
-            </div>
-        </nav>
+				<!-- Actions -->
+				<div class="flex flex-wrap gap-3">
+					<form action="{{ path('expenses_import_recurring', { year: year, month: month }) }}" method="post" style="display: inline;">
+						<input type="hidden" name="_token" value="{{ csrf_token('import_recurring') }}">
+						<button type="submit" class="btn-secondary" onclick="return confirm('Czy na pewno chcesz zaimportować wydatki cykliczne do bieżącego miesiąca?')">
+							<svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+							</svg>
+							Importuj cykliczne
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
 
-        <div class="table-container">
-            <table class="min-w-full leading-normal">
-                <thead>
-                <tr class="border-t">
-                    {% set headers = ['Date', 'Name', 'Cost', 'Category', 'Status'] %}
-                    {% for header in headers %}
-                        <th class="table-header">{{ header }}</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in expenses %}
-                    {% set isOccurrence = item.expense is defined %}
-                    {% set expense = isOccurrence ? item.expense : item %}
-                    {% set itemId = isOccurrence ? item.id : expense.id %}
-                    {% set itemDate = isOccurrence ? item.occurrenceDate : expense.date %}
-                    {% set itemStatus = isOccurrence ? item.paymentStatus : expense.paymentStatus %}
+		<!-- Expenses Table -->
+		<div class="table-container">
+			<table class="min-w-full leading-normal">
+				<thead>
+					<tr>
+						{% set headers = ['Data', 'Nazwa', 'Kwota', 'Kategoria', 'Cykliczność', 'Status'] %}
+						{% for header in headers %}
+							<th class="table-header">{{ header }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in expenses %}
+						{% set isOccurrence = item.expense is defined %}
+						{% set expense = isOccurrence ? item.expense : item %}
+						{% set itemId = isOccurrence ? item.id : expense.id %}
+						{% set itemDate = isOccurrence ? item.occurrenceDate : expense.date %}
+						{% set itemStatus = isOccurrence ? item.paymentStatus : expense.paymentStatus %}
 
-                    <tr id="{% if isOccurrence %}occurrence-{{ itemId }}{% else %}expense-{{ itemId }}{% endif %}"{% if expense.isRecurring %} class="recurring-expense"{% endif %}>
-                        <td class="table-cell">
-                            {{ itemDate|date('d.m.Y') }}
-                        </td>
-                        <td class="table-cell">
-                            {{ expense.name }}
-                        </td>
-                        <td class="table-cell">
-                            {{ expense.amount|number_format(2, ',', ' ') }} zł
-                        </td>
-                        <td class="table-cell">
-                            {% if expense.category %}
-                                {{ expense.category.namePolish }}
-                            {% else %}
-                                Brak kategorii
-                            {% endif %}
-                        </td>
-                        <td class="table-cell status-cell cursor-pointer relative" data-id="{{ itemId }}" data-type="{% if isOccurrence %}occurrence{% else %}expense{% endif %}">
-                            <span class="status-text hover:text-shadow
-                                {% if itemStatus == 'unpaid'%} text-red-500 {% endif %}
-                                {% if itemStatus == 'paid'%} text-green-600 {% endif %}
-                                {% if itemStatus == 'partially_paid'%} text-yellow-600 {% endif %}
-                            ">
-                                {{ itemStatus|capitalize }}
-                            </span>
-                            {% if expense.isRecurring %}
-                                <span class="recurring-indicator ml-2 text-sm opacity-70" title="Cykl: co {{ expense.recurringFrequency }} {% if expense.recurringFrequency == 1 %}miesiąc{% else %}miesięcy{% endif %}">🔄{{ expense.recurringFrequency }}</span>
-                            {% endif %}
-                            <select class="status-select absolute right-2 top-2 p-1 hidden w-full cursor-pointer">
-                                {% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
-                                {% for status in statuses %}
-                                    <option value="{{ status }}" {% if itemStatus == status %}selected{% endif %}>
-                                        {{ status|replace({'_': ' '})|title }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="{{ headers|length }}" class="table-cell">No expenses found.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+						<tr id="{% if isOccurrence %}occurrence-{{ itemId }}{% else %}expense-{{ itemId }}{% endif %}" {% if expense.isRecurring %} class="recurring-expense" {% endif %} class="hover:bg-blue-50/50 transition-colors duration-200">
+							<td class="table-cell font-medium">
+								<div class="flex items-center">
+									<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+									</svg>
+									{{ itemDate|date('d.m.Y') }}
+								</div>
+							</td>
+							<td class="table-cell">
+								<div class="flex items-center">
+									<div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+										<span class="text-white text-xs font-bold">{{ expense.name|slice(0, 1)|upper }}</span>
+									</div>
+									{{ expense.name }}
+								</div>
+							</td>
+							<td class="table-cell font-semibold text-end ">
+								{{ expense.amount|number_format(2, ',', ' ') }}
+								zł
+							</td>
+							<td class="table-cell">
+								{% if expense.category %}
+									<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+										{{ expense.category.namePolish }}
+									</span>
+								{% else %}
+									<span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+										Brak kategorii
+									</span>
+								{% endif %}
+							</td>
+							<td class="table-cell">
+								{% if expense.isRecurring %}
+									<span>{{ expense.recurringFrequency ?? ''}}</span>
+								{% endif %}
+							</td>
+							<td class="table-cell status-cell cursor-pointer relative" data-id="{{ itemId }}" data-type="{% if isOccurrence %}occurrence{% else %}expense{% endif %}">
+								<div class="flex items-center justify-between">
+									<span class="status-text font-semibold
+																																	                                    {% if itemStatus == 'unpaid'%} status-unpaid {% endif %}
+																																	                                    {% if itemStatus == 'paid'%} status-paid {% endif %}
+																																	                                    {% if itemStatus == 'partially_paid'%} status-partially-paid {% endif %}
+																																	                                ">
+										{% if itemStatus == 'paid' %}
+											<svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewbox="0 0 20 20">
+												<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+											</svg>
+										{% elseif itemStatus == 'unpaid' %}
+											<svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewbox="0 0 20 20">
+												<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+											</svg>
+										{% else %}
+											<svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewbox="0 0 20 20">
+												<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+											</svg>
+										{% endif %}
+										{{ itemStatus|replace({'_': ' '})|title }}
+									</span>
+								</div>
+								<select class="status-select absolute right-2 top-2 p-2 hidden w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+									{% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
+									{% for status in statuses %}
+										<option value="{{ status }}" {% if itemStatus == status %} selected {% endif %}>
+											{{ status|replace({'_': ' '})|title }}
+										</option>
+									{% endfor %}
+								</select>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="{{ headers|length }}" class="table-cell text-center py-12">
+								<div class="flex flex-col items-center">
+									<svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+									</svg>
+									<p class="text-gray-500 text-lg font-medium">Brak wydatków w tym miesiącu</p>
+									<p class="text-gray-400">Dodaj pierwszy wydatek, aby zacząć śledzenie.</p>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('build/expenses_index.js') }}"></script>
+	{{ parent() }}
+	<script src="{{ asset('build/expenses_index.js') }}"></script>
 {% endblock %}
