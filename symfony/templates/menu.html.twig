@@ -15,9 +15,10 @@
             <ul class="hidden md:flex items-center space-x-2">
                 {% for item in menu_items %}
                     <li>
-                        <a href="{{ item.path }}" class="nav-link">{{ item.friendly_name }}</a>
+                        <a href="{{ item.path }}" class="nav-link {% if item.active %}font-bold underline decoration-2 underline-offset-4 {% endif %}">{{ item.friendly_name }}</a>
                     </li>
                 {% endfor %}
+                </ul>
             </ul>
 
             <!-- User Section -->
@@ -62,7 +63,7 @@
             <ul class="px-2 pt-2 pb-3 space-y-1 bg-white/10 backdrop-blur-sm rounded-lg mt-2">
                 {% for item in menu_items %}
                     <li>
-                        <a href="{{ item.path }}" class="block px-3 py-2 text-white hover:bg-white/20 rounded-lg transition-colors">
+                        <a href="{{ item.path }}" class="block px-3 py-2 text-white hover:bg-white/20 rounded-lg transition-colors {% if item.active %}font-bold underline decoration-2 underline-offset-4 {% endif %}">
                             {{ item.friendly_name }}
                         </a>
                     </li>

@@ -5,19 +5,24 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 use App\Repository\MenuRepository;
 
 class BaseController extends AbstractController
 {
     public function __construct(
         protected RouterInterface $router,
-        protected MenuRepository  $menuRepository
+        protected MenuRepository  $menuRepository,
+        protected RequestStack $requestStack
     )
     {
     }
 
     protected function renderWithRoutes(string $view, array $parameters = [], ?Response $response = null): Response
     {
+        // Pobierz aktualną nazwę trasy z requestu
+        $currentRoute = $this->requestStack->getCurrentRequest()?->attributes->get('_route');
+
         // Pobierz elementy menu z bazy danych
         $menuItems = $this->menuRepository->findBy([], ['order' => 'ASC']);
 
@@ -32,6 +37,7 @@ class BaseController extends AbstractController
                 'order' => $menuItem->getOrder(),
                 'activated' => $menuItem->isActivated(),
                 'route_name' => $menuItem->getRouteName(),
+                'active' => $currentRoute === $menuItem->getRouteName()
             ];
         }
 
@@ -44,6 +50,11 @@ class BaseController extends AbstractController
             }
 
             $routeName = $route['route_name'];
+
+            // Ukryj admin_menu dla użytkowników bez roli ROLE_ADMIN
+            if ($routeName === 'admin_menu' && !$this->isGranted('ROLE_ADMIN')) {
+                return false;
+            }
 
             // Niektóre strony wymagają logowania
             $requiresAuth = in_array($routeName, ['expenses', 'categories', 'admin_menu']);

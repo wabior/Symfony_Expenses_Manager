@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\ExpenseService;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RouteController extends BaseController
 {
@@ -16,9 +17,10 @@ class RouteController extends BaseController
         RouterInterface $router,
         protected MenuRepository $menuRepository,
         private ExpenseService $expensesService,
+        RequestStack $requestStack
     )
     {
-        parent::__construct($router, $menuRepository);
+        parent::__construct($router, $menuRepository, $requestStack);
     }
 
     #[Route('/', name: 'home', options: ['friendly_name' => 'Start', 'order' => 1])]
