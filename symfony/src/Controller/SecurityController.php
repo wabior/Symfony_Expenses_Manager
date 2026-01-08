@@ -6,13 +6,14 @@ use App\Repository\MenuRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends BaseController
 {
-    public function __construct(RouterInterface $router, MenuRepository $menuRepository)
+    public function __construct(RouterInterface $router, MenuRepository $menuRepository, RequestStack $requestStack)
     {
-        parent::__construct($router, $menuRepository);
+        parent::__construct($router, $menuRepository, $requestStack);
     }
 
     #[Route(path: '/login', name: 'app_login')]

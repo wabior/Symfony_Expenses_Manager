@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ExpenseController extends BaseController
@@ -17,10 +18,16 @@ class ExpenseController extends BaseController
     protected RouterInterface $router;
     private ExpenseService $expenseService;
 
-    public function __construct(RouterInterface $router, EntityManagerInterface $entityManager, ExpenseService $expenseService, MenuRepository $menuRepository)
+    public function __construct(
+        RouterInterface $router,
+        EntityManagerInterface $entityManager,
+        ExpenseService $expenseService,
+        MenuRepository $menuRepository,
+        RequestStack $requestStack
+        )
     {
         $this->expenseService = $expenseService;
-        parent::__construct($router, $menuRepository);
+        parent::__construct($router, $menuRepository, $requestStack);
     }
 
     #[IsGranted('ROLE_USER')]

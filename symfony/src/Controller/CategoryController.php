@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CategoryController extends BaseController
@@ -16,10 +17,16 @@ class CategoryController extends BaseController
     protected RouterInterface $router;
     private CategoryService $categoryService;
 
-    public function __construct(RouterInterface $router, EntityManagerInterface $entityManager, CategoryService $categoryService, MenuRepository $menuRepository)
+    public function __construct(
+        RouterInterface $router,
+        EntityManagerInterface $entityManager,
+        CategoryService $categoryService,
+        MenuRepository $menuRepository,
+        RequestStack $requestStack
+    )
     {
         $this->categoryService = $categoryService;
-        parent::__construct($router, $menuRepository);
+        parent::__construct($router, $menuRepository, $requestStack);
     }
 
     #[IsGranted('ROLE_USER')]
