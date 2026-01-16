@@ -21,7 +21,7 @@ class ExpenseService
         $this->security = $security;
     }
 
-    private function getCurrentUser(): User
+    public function getCurrentUser(): User
     {
         /** @var User $user */
         $user = $this->security->getUser();
@@ -35,6 +35,19 @@ class ExpenseService
     {
         $user = $this->getCurrentUser();
         return $this->entityManager->getRepository(Expense::class)->findByUser($user);
+    }
+
+
+    public function getExpenseById(int $id): ?Expense
+    {
+        $user = $this->getCurrentUser();
+
+        $expense = $this->entityManager->getRepository(Expense::class)->findOneBy([
+            'id' => $id,
+            'user' => $user
+        ]);
+
+        return $expense;
     }
 
     public function getExpensesByMonth(int $year, int $month): array
@@ -251,7 +264,7 @@ class ExpenseService
         $toDate = new \DateTime("$toYear-$toMonth-01");
 
         $monthsDiff = ($toDate->format('Y') - $fromDate->format('Y')) * 12 +
-                     ($toDate->format('n') - $fromDate->format('n'));
+            ($toDate->format('n') - $fromDate->format('n'));
 
         return $monthsDiff % $frequency === 0;
     }
@@ -273,6 +286,49 @@ class ExpenseService
             $occurrence->setPaymentDate($paymentDate);
         } elseif ($status === 'unpaid') {
             $occurrence->setPaymentDate(null);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function updateExpense(Request $request, int $id): void
+    {
+        $expense = $this->entityManager->find(Expense::class, $id);
+        $user = $this->getCurrentUser();
+
+        if (!$expense || $expense->getUser() !== $user) {
+            throw new \Exception('Expense not found or access denied');
+        }
+
+        $data = $request->request->all();
+
+        // Walidacja
+        if (empty($data['name'])) {
+            throw new \InvalidArgumentException('Name required');
+        }
+
+        if (empty($data['amount']) || !is_numeric($data['amount'])) {
+            throw new \InvalidArgumentException('Amount required');
+        }
+
+        // Aktualizacja pól
+        $expense->setName($data['name']);
+        $expense->setAmount($data['amount']);
+        $expense->setDate(new \DateTime($data['date']));
+        $expense->setRecurringFrequency((int) $data['recurringFrequency']);
+
+        // Kategoria
+        $category = $this->entityManager->getRepository(Category::class)->find($data['category']);
+
+        if (!$category) {
+            throw new \InvalidArgumentException('Invalid category selected');
+        }
+
+        $expense->setCategory($category);
+
+        // Data płatności
+        if (!empty($data['paymentDate'])) {
+            $expense->setPaymentDate(new \DateTime($data['paymentDate']));
         }
 
         $this->entityManager->flush();

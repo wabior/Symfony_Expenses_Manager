@@ -147,4 +147,30 @@ class ExpenseController extends BaseController
             return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
         }
     }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/expenses/edit/{id}', name: 'expenses_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, int $id): Response {
+        $expense = $this->expenseService->getExpenseById($id);
+
+        if (!$expense || $expense->getUser() !== $this->expenseService->getCurrentUser()) {
+            throw $this->createNotFoundException('Expense not found');
+        }
+
+        if ($request->isMethod('POST')) {
+            try {
+                $this->expenseService->updateExpense($request, $id);
+                $this->addFlash('success', 'Expense updated successfully');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Expense update failed: ' . $e->getMessage());
+            }
+        }
+
+        $categories = $this->expenseService->getAllCategories();
+
+        return $this->renderWithRoutes('expenses/add.html.twig', [
+            'expense' => $expense,
+            'categories' => $categories,
+        ]);
+    }
 }

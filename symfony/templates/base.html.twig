@@ -17,10 +17,20 @@
         {% block menu %}
             {% include 'menu.html.twig' with {'menu_items': menu_items} %}
         {% endblock %}
-    </header>
+    </header>  
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="container mx-auto alert alert-{{ type }} bg-{{ type == 'success' ? 'green' : 'red' }}-100 border border-{{ type == 'success' ? 'green' : 'red' }}-400 text-{{ type == 'success' ? 'green' : 'red' }}-700 px-4 py-3 rounded mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %} 
 
     <main class="flex-grow">
-        {% block content %}{% endblock %}
+        {% block content %}
+        
+        {% endblock %}
     </main>
 
     <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-8 mt-auto">
