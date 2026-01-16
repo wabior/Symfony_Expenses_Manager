@@ -1,19 +1,26 @@
-document.addEventListener('DOMContentLoaded', function () {
+const initPaymentStatus = () => {
     const paymentStatusSelect = document.getElementById('paymentStatus');
-    const paymentDateInput = document.getElementById('paymentDate').closest('div'); // Get the containing div
+    const paymentDateInput = document.getElementById('paymentDate');
 
-    console.log('dupa')
-
-    function togglePaymentDate() {
-        if (paymentStatusSelect.value === 'unpaid') {
-            paymentDateInput.style.display = 'none';
-        } else {
-            paymentDateInput.style.display = 'block';
-        }
+    // Only proceed if both elements exist (only in add form, not edit)
+    if (!paymentStatusSelect || !paymentDateInput) {
+        return;
     }
+
+    const paymentDateContainer = paymentDateInput.closest('div');
+
+    const togglePaymentDate = () => {
+        if (paymentStatusSelect.value === 'unpaid') {
+            paymentDateContainer.style.display = 'none';
+        } else {
+            paymentDateContainer.style.display = 'block';
+        }
+    };
 
     paymentStatusSelect.addEventListener('change', togglePaymentDate);
 
     // Initialize the visibility based on the initial status
     togglePaymentDate();
-});
+};
+
+document.addEventListener('DOMContentLoaded', initPaymentStatus);

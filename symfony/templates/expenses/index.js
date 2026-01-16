@@ -71,7 +71,7 @@ document.querySelectorAll('.recurring-indicator').forEach(indicator => {
     indicator.addEventListener('click', (e) => {
         e.stopPropagation();
         const frequency = indicator.textContent.replace('🔄', '');
-        const frequencyText = frequency == 1 ? 'miesiąc' : 'miesięcy';
+        const frequencyText = frequency === 1 ? 'miesiąc' : 'miesięcy';
         alert(`To jest wydatek cykliczny - powtarza się co ${frequency} ${frequencyText}.`);
     });
 });

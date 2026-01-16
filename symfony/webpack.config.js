@@ -23,6 +23,7 @@ Encore
     .addEntry('app', './assets/app.js')
     .addEntry('payment_status', './assets/js/payment_status.js')
     .addEntry('expenses_index', './templates/expenses/index.js')
+    .addEntry('delete_modal', './assets/js/delete_modal.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
