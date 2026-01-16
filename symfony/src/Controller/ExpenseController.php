@@ -168,9 +168,23 @@ class ExpenseController extends BaseController
 
         $categories = $this->expenseService->getAllCategories();
 
-        return $this->renderWithRoutes('expenses/add.html.twig', [
+        return $this->renderWithRoutes('expenses/edit.html.twig', [
             'expense' => $expense,
             'categories' => $categories,
         ]);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/expenses/delete/{id}', name: 'expenses_delete', methods: ['POST'])]
+    public function delete(int $id): Response
+    {
+        try {
+            $this->expenseService->deleteExpense($id);
+            $this->addFlash('success', 'Expense deleted successfully');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Expense deletion failed: ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('expenses');
     }
 }

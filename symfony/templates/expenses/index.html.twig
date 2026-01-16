@@ -164,5 +164,5 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="{{ asset('build/expenses_index.js') }}"></script>
+	{{ encore_entry_script_tags('expenses_index') }}
 {% endblock %}
