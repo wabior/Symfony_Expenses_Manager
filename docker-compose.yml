@@ -13,11 +13,11 @@ services:
     depends_on:
       - db
     environment:
-      MYSQL_DATABASE: symfony
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
-      MYSQL_ROOT_PASSWORD: root
-      DATABASE_URL: "mysql://symfony:symfony@db:3306/symfony"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-symfony}
+      MYSQL_USER: ${MYSQL_USER:-symfony}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-symfony}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      DATABASE_URL: "mysql://${MYSQL_USER:-symfony}:${MYSQL_PASSWORD:-symfony}@db:3306/${MYSQL_DATABASE:-symfony}?serverVersion=8.0"
       TZ: Europe/Warsaw
     command: >
       bash -c "
@@ -42,10 +42,10 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: symfony
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-symfony}
+      MYSQL_USER: ${MYSQL_USER:-symfony}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-symfony}
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -55,8 +55,8 @@ services:
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
-      PMA_USER: symfony
-      PMA_PASSWORD: symfony
+      PMA_USER: ${MYSQL_USER:-symfony}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-symfony}
     depends_on:
       - db
 
