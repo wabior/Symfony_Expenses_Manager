@@ -69,35 +69,35 @@ Umożliwia śledzenie, kategoryzowanie i analizę wydatków z intuicyjnym interf
 git clone https://github.com/wabior/Symfony_Expenses_Manager.git
 cd Symfony_Expenses_Manager
 
-# 2. Uruchom kontenery Docker
+# 2. Skonfiguruj środowisko
+cp symfony/.env symfony/.env.local
+# Edytuj symfony/.env.local i zmień hasła:
+# MYSQL_PASSWORD=twoje_bezpieczne_haslo_2024
+# MYSQL_ROOT_PASSWORD=twoje_bezpieczne_haslo_root_2024
+# APP_SECRET=twoj_sekretny_klucz
+
+# 3. Uruchom kontenery Docker
 docker compose up -d --build
 
-# 3. Zainstaluj zależności (jeśli potrzebne)
+# 4. Zainstaluj zależności (jeśli potrzebne)
 docker compose exec php bash -c "cd /var/www/html/symfony && composer install && npm install"
 
-# 4. Wykonaj migracje bazy danych
+# 5. Wykonaj migracje bazy danych
 docker compose exec php bash -c "cd /var/www/html/symfony && php bin/console doctrine:migrations:migrate --no-interaction"
-
-# 5. Załaduj dane testowe (opcjonalne)
-docker compose exec php bash -c "cd /var/www/html/symfony && php bin/console doctrine:fixtures:load --no-interaction"
 ```
 
 **Aplikacja będzie dostępna pod adresem:** **http://localhost:8000**  
-**PhpMyAdmin:** **http://localhost:8080** (user: `symfony`, hasło: `dev_symfony_password_2024`)
+**PhpMyAdmin:** **http://localhost:8080** (login: `symfony`, hasło: to z `.env.local`)
 
 ### 🔐 **Konfiguracja środowiska development**
 
-Pliki konfiguracyjne są już przygotowane do pracy:
+Pliki konfiguracyjne są przygotowane do pracy:
 
-- **`symfony/.env`** - domyślna konfiguracja development
-- **`symfony/.env.local`** - Twoje lokalne hasła (nie commitowane)
-- **`docker-compose.yml`** - używa zmiennych środowiskowych z wartościami domyślnymi
+- **`symfony/.env`** - szablon konfiguracji (nie zmieniaj bezpośrednio)
+- **`symfony/.env.local`** - Twoje lokalne hasła i sekrety (nie commitowane)
+- **`docker-compose.yml`** - używa zmiennych środowiskowych z `.env.local`
 
-**Bezpieczne hasła development są już skonfigurowane w `.env.local`:**
-```bash
-MYSQL_ROOT_PASSWORD=dev_root_password_2024
-MYSQL_PASSWORD=dev_symfony_password_2024
-```
+**Ważne:** Zawsze twórz `.env.local` z bezpiecznymi hasłami przed pierwszym uruchomieniem!
 
 ---
 
@@ -202,9 +202,18 @@ sudo systemctl restart apache2
 
 ## 📖 **Użytkowanie**
 
+### Jak zostać administratorem:
+1. **Zarejestruj konto** przez http://localhost:8000/register
+2. **Zaloguj się do PhpMyAdmin** (http://localhost:8080)
+3. **W tabeli `user`** znajdź swojego użytkownika i edytuj kolumnę `roles` na:
+   ```
+   ["ROLE_ADMIN"]
+   ```
+4. **Zaloguj się ponownie** - masz dostęp do panelu admina!
+
 ### Dla nowych użytkowników:
 1. Przejdź na stronę główną
-2. Kliknij **"Zaloguj"** lub **"Rejestracja"**
+2. Kliknij **"Zarejestruj się"** lub **"Zaloguj"**
 3. Zarejestruj nowe konto lub zaloguj się
 4. Rozpocznij zarządzanie wydatkami!
 
@@ -227,7 +236,7 @@ docker compose logs -f db              # Podgląd logów bazy danych
 
 # Dostęp do kontenerów
 docker compose exec php bash           # Konsola PHP
-docker compose exec db mysql -u symfony -pdev_symfony_password_2024 symfony  # Konsola MySQL
+docker compose exec db mysql -u symfony -p$MYSQL_PASSWORD symfony  # Konsola MySQL (użyj hasła z .env.local)
 
 # Symfony komendy
 docker compose exec php php /var/www/html/symfony/bin/console cache:clear
