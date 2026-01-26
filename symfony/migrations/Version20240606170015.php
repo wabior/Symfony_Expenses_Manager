@@ -43,7 +43,8 @@ final class Version20240606170015 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // Optional: remove data from the menu table if migration is rolled back
-        $this->addSql("DELETE FROM menu WHERE route_name IN ('home', 'expenses', 'categories', 'about')");
+        // Remove data and drop the menu table if migration is rolled back
+        $this->addSql("DELETE FROM menu WHERE route_name IN ('home', 'expenses', 'categories', 'about', 'admin')");
+        $this->addSql("DROP TABLE menu");
     }
 }
