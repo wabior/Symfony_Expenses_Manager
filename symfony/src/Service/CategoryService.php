@@ -19,13 +19,18 @@ class CategoryService
         return $this->entityManager->getRepository(Category::class)->findAll();
     }
 
-    public function addCategory(string $nameEnglish, string $namePolish): void
+    public function addCategory(string $name): void
     {
         $category = new Category();
-        $category->setNameEnglish($nameEnglish);
-        $category->setNamePolish($namePolish);
+        $category->setName($name);
 
         $this->entityManager->persist($category);
         $this->entityManager->flush();
+    }
+
+    public function hasCategories(): bool
+    {
+        $count = $this->entityManager->getRepository(Category::class)->count([]);
+        return $count > 0;
     }
 }

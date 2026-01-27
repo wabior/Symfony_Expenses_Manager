@@ -22,7 +22,7 @@
             <div>
                 <label for="email" class="block text-lg font-semibold text-gray-800">Email:</label>
                 <input type="email" value="{{ email }}" name="email" id="email" required autofocus
-                       class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg focus:border-blue-500 focus:outline-none{% if errors.email is defined %} border-red-500{% endif %}">
+                       class="mt-2 block w-full form-input{% if errors.email is defined %} border-red-500{% endif %}">
                 {% if errors.email is defined %}
                     <p class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
                 {% endif %}
@@ -31,7 +31,7 @@
             <div>
                 <label for="password" class="block text-lg font-semibold text-gray-800">Hasło:</label>
                 <input type="password" name="password" id="password" required
-                       class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg focus:border-blue-500 focus:outline-none{% if errors.password is defined %} border-red-500{% endif %}">
+                       class="mt-2 block w-full form-input{% if errors.password is defined %} border-red-500{% endif %}">
                 {% if errors.password is defined %}
                     <p class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
                 {% endif %}
@@ -40,7 +40,7 @@
             <div>
                 <label for="confirm_password" class="block text-lg font-semibold text-gray-800">Potwierdź hasło:</label>
                 <input type="password" name="confirm_password" id="confirm_password" required
-                       class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg focus:border-blue-500 focus:outline-none{% if errors.confirm_password is defined %} border-red-500{% endif %}">
+                       class="mt-2 block w-full form-input{% if errors.confirm_password is defined %} border-red-500{% endif %}">
                 {% if errors.confirm_password is defined %}
                     <p class="mt-1 text-sm text-red-600">{{ errors.confirm_password }}</p>
                 {% endif %}

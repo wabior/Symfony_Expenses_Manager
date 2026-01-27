@@ -1,63 +1,70 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {% if expense is defined %}Edit Expense{% else %}Add Expense{% endif %}
+    {% if expense is defined %}Edytuj wydatek{% else %}Dodaj wydatek{% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="container mx-auto mt-4 xl:w-1/3">
     <h1 class="text-2xl font-bold text-gray-900 mb-8">
-        {% if expense is defined %}Edit expense{% else %}Add a new expense{% endif %}
+        {% if expense is defined %}Edytuj wydatek{% else %}Dodaj nowy wydatek{% endif %}
     </h1>
         <form action="{{ path(expense is defined ? 'expenses_edit' : 'expenses_add', expense is defined ? {id: expense.id} : {}) }}"
             method="post" class="space-y-6 bg-white/25 p-8 shadow-xl rounded-lg">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
             <div>
-                <label for="name" class="block text-lg font-semibold text-gray-800">Expense Name:</label>
+                <label for="name" class="block text-lg font-semibold text-gray-800">Nazwa wydatku:</label>
                 <input type="text" id="name" name="name" required
                     value="{{ expense.name ?? '' }}"
                     class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
             </div>
             <div class="flex space-x-4">
                 <div class="flex-1">
-                    <label for="amount" class="block text-lg font-semibold text-gray-800">Amount:</label>
+                    <label for="amount" class="block text-lg font-semibold text-gray-800">Kwota:</label>
                     <input type="number" id="amount" name="amount" step="0.01" required
                         value="{{ expense.amount ?? '' }}"
                         class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
                 </div>
                 {% if expense is not defined %}
                 <div class="flex-1">
-                    <label for="paymentStatus" class="block text-lg font-semibold text-gray-800">Payment Status:</label>
-                    <select id="paymentStatus" name="paymentStatus" required class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg">
-                        <option value="unpaid" {{ (expense.paymentStatus ?? 'unpaid') == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
-                        <option value="paid" {{ (expense.paymentStatus ?? 'unpaid') == 'paid' ? 'selected' : '' }}>Paid</option>
-                        <option value="partially_paid" {{ (expense.paymentStatus ?? 'unpaid') == 'partially_paid' ? 'selected' : '' }}>Partially Paid</option>
-                    </select>
+                    <label for="paymentStatus" class="block text-lg font-semibold text-gray-800">Status płatności:</label>
+                    {% include 'components/select.html.twig' with {
+                        id: 'paymentStatus',
+                        name: 'paymentStatus',
+                        required: true,
+                        selected: expense.paymentStatus ?? 'unpaid',
+                        options: {
+                            'unpaid': 'Nieopłacony',
+                            'paid': 'Opłacony',
+                            'partially_paid': 'Częściowo opłacony'
+                        }
+                    } %}
                 </div>
                 {% endif %}
             </div>
             <div>
-                <label for="date" class="block text-lg font-semibold text-gray-800">Date:</label>
+                <label for="date" class="block text-lg font-semibold text-gray-800">Data:</label>
                 <input type="date" id="date" name="date" required 
                     value="{{ expense is defined and expense.date ? expense.date|date('Y-m-d') : "now"|date("Y-m-d") }}"
                     class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
             </div>
             <div>
-                <label for="category" class="block text-lg font-semibold text-gray-800">Category:</label>
-                <select id="category" name="category" required class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
-                    {% for category in categories %}
-                        <option value="{{ category.id }}" {{ expense is defined and expense.category and expense.category.id == category.id ? 'selected' :
-                            (expense is not defined and loop.last ? 'selected' : '')
-                        }}>
-                            {{ category.namePolish }}
-                        </option>
-                    {% endfor %}
-                </select>
+                <label for="category" class="block text-lg font-semibold text-gray-800">Kategoria:</label>
+                {% include 'components/select.html.twig' with {
+                    id: 'category',
+                    name: 'category',
+                    required: true,
+                    selected: expense.category.id ?? null,
+                    options: categories|map(category => { (category.id): category.name })|reduce((carry, item) => carry|merge(item), {})
+                } %}
             </div>
             <div>
                 <label for="recurringFrequency" class="block text-lg font-semibold text-gray-800">Cykl powtarzania:</label>
-                <select id="recurringFrequency" name="recurringFrequency" class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
-                    {% set frequencies = {
+                {% include 'components/select.html.twig' with {
+                    id: 'recurringFrequency',
+                    name: 'recurringFrequency',
+                    selected: expense.recurringFrequency ?? 0,
+                    options: {
                         0: 'Nie powtarza się',
                         1: 'Co 1 miesiąc',
                         2: 'Co 2 miesiące',
@@ -65,19 +72,13 @@
                         4: 'Co 4 miesiące',
                         6: 'Co 6 miesięcy',
                         12: 'Co 12 miesięcy'
-                    } %}
-    
-                    {% for value, label in frequencies %}
-                        <option value="{{ value }}" {{ expense is defined and (expense.recurringFrequency ?? 0) == value ? 'selected' : '' }}>
-                            {{ label }}
-                        </option>
-                    {% endfor %}
-                </select>
+                    }
+                } %}
                 <p class="text-sm text-gray-600 mt-1">Wydatki z cyklem > 0 będą automatycznie dodawane w następnych miesiącach.</p>
             </div>
             {% if expense is not defined %}
             <div>
-                <label for="paymentDate" class="block text-lg font-semibold text-gray-800">Payment Date:</label>
+                <label for="paymentDate" class="block text-lg font-semibold text-gray-800">Data płatności:</label>
                 <input type="date" id="paymentDate" name="paymentDate"
                     value="{{ expense is defined and expense.paymentDate ? expense.paymentDate|date('Y-m-d') : '' }}"
                     class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
@@ -88,11 +89,11 @@
                 <button type="button" 
                     class="px-6 py-3 bg-red-400 text-white font-bold text-lg rounded-lg hover:bg-red-800"
                     onclick="showDeleteConfirm({{ expense.id }})">
-                    Delete Expense
+                    Usuń wydatek
                 </button>
                 {% endif %}
                 <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">
-                    {% if expense is defined %}Update Expense{% else %}Add Expense{% endif %}
+                    {% if expense is defined %}Zaktualizuj wydatek{% else %}Dodaj wydatek{% endif %}
                 </button>
             </div>
         </form>
