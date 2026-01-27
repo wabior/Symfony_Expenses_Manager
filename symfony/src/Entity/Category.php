@@ -4,7 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: "App\Repository\CategoryRepository")]class Category
+#[ORM\Entity(repositoryClass: "App\Repository\CategoryRepository")]
+class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -12,36 +13,22 @@ use Doctrine\ORM\Mapping as ORM;
     private $id;
 
     #[ORM\Column(type: "string", length: 255)]
-    private $nameEnglish;
+    private $name;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private $namePolish;
-
-// Gettery i settery
+    // Gettery i settery
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNameEnglish(): ?string
+    public function getName(): ?string
     {
-        return $this->nameEnglish;
+        return $this->name;
     }
 
-    public function setNameEnglish(string $nameEnglish): self
+    public function setName(string $name): self
     {
-        $this->nameEnglish = $nameEnglish;
-        return $this;
-    }
-
-    public function getNamePolish(): ?string
-    {
-        return $this->namePolish;
-    }
-
-    public function setNamePolish(string $namePolish): self
-    {
-        $this->namePolish = $namePolish;
+        $this->name = $name;
         return $this;
     }
 }

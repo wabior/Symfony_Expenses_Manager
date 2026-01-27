@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\MenuRepository;
+use App\Service\CategoryService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +18,7 @@ class RouteController extends BaseController
         RouterInterface $router,
         protected MenuRepository $menuRepository,
         private ExpenseService $expensesService,
+        private CategoryService $categoryService,
         RequestStack $requestStack
     )
     {
@@ -26,7 +28,11 @@ class RouteController extends BaseController
     #[Route('/', name: 'home', options: ['friendly_name' => 'Start', 'order' => 1])]
     public function home(): Response
     {
-        return $this->renderWithRoutes('home.html.twig');
+        $hasCategories = $this->categoryService->hasCategories();
+        
+        return $this->renderWithRoutes('home.html.twig', [
+            'hasCategories' => $hasCategories
+        ]);
     }
 
     #[Route('/about', name: 'about', options: ['friendly_name' => 'O nas', 'order' => 4])]
@@ -34,6 +40,5 @@ class RouteController extends BaseController
     {
         return $this->renderWithRoutes('about.html.twig');
     }
-
 
 }

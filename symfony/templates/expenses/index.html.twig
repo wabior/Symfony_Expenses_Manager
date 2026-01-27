@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Expenses{% endblock %}
+{% block title %}Wydatki{% endblock %}
 
 {% block content %}
 	<div class="container mx-auto px-4 py-8 animate-fade-in-up">
@@ -33,20 +33,20 @@
 
 				<!-- Actions -->
 				<div class="flex flex-wrap gap-3">
-					<a href="{{ path('expenses_add') }}" class="btn-primary">
-						<svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-						</svg>
-						Dodaj wydatek
-					</a>
+					{% include 'components/button.html.twig' with {
+						href: path('expenses_add'),
+						text: 'Dodaj wydatek',
+						icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>'
+					} %}
 					<form action="{{ path('expenses_import_recurring', { year: year, month: month }) }}" method="post" style="display: inline;">
 						<input type="hidden" name="_token" value="{{ csrf_token('import_recurring') }}">
-						<button type="submit" class="btn-secondary" onclick="return confirm('Czy na pewno chcesz zaimportować wydatki cykliczne do bieżącego miesiąca?')">
-							<svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-							</svg>
-							Importuj cykliczne
-						</button>
+						{% include 'components/button.html.twig' with {
+							text: 'Importuj cykliczne',
+							icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>',
+							class: 'btn-secondary',
+							type: 'submit',
+							additional_class: 'cursor-pointer'
+						} %}
 					</form>
 				</div>
 			</div>
@@ -97,7 +97,7 @@
 							<td class="table-cell">
 								{% if expense.category %}
 									<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-										{{ expense.category.namePolish }}
+										{{ expense.category.name }}
 									</span>
 								{% else %}
 									<span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
@@ -133,11 +133,15 @@
 										{{ itemStatus|replace({'_': ' '})|title }}
 									</span>
 								</div>
-								<select class="status-select absolute right-2 top-2 p-2 hidden w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-									{% set statuses = ['unpaid', 'paid', 'partially_paid'] %}
-									{% for status in statuses %}
-										<option value="{{ status }}" {% if itemStatus == status %} selected {% endif %}>
-											{{ status|replace({'_': ' '})|title }}
+								<select class="status-select absolute right-2 top-2 p-2 hidden w-full bg-white border border-gray-300 rounded-lg shadow-lg form-select">
+									{% set statuses = {
+										'unpaid': 'Nieopłacony',
+										'paid': 'Opłacony',
+										'partially_paid': 'Częściowo opłacony'
+									} %}
+									{% for value, label in statuses %}
+										<option value="{{ value }}" {% if itemStatus == value %} selected {% endif %}>
+											{{ label }}
 										</option>
 									{% endfor %}
 								</select>
