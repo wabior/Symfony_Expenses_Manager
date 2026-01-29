@@ -54,8 +54,9 @@
                     id: 'category',
                     name: 'category',
                     required: true,
-                    selected: expense.category.id ?? null,
-                    options: categories|map(category => { (category.id): category.name })|reduce((carry, item) => carry|merge(item), {})
+                    show_placeholder: false,
+                    selected: categories|first.getId(),
+                    options: categoryOptions
                 } %}
             </div>
             <div>

@@ -15,7 +15,7 @@
             <ul class="hidden md:flex items-center space-x-2">
                 {% for item in menu_items %}
                     <li>
-                        <a href="{{ item.path }}" class="nav-link {% if item.active %}font-bold underline decoration-2 underline-offset-4 {% endif %}">{{ item.friendly_name }}</a>
+                        <a href="{{ item.path }}" class="nav-link {% if item.active %}font-bold {% endif %}">{{ item.friendly_name }}</a>
                     </li>
                 {% endfor %}
                 </ul>

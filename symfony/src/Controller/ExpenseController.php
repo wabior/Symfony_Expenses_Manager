@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\MenuRepository;
 use App\Service\ExpenseService;
+use App\Entity\ExpenseOccurrence;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ class ExpenseController extends BaseController
 {
     protected RouterInterface $router;
     private ExpenseService $expenseService;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         RouterInterface $router,
@@ -27,6 +29,7 @@ class ExpenseController extends BaseController
         )
     {
         $this->expenseService = $expenseService;
+        $this->entityManager = $entityManager;
         parent::__construct($router, $menuRepository, $requestStack);
     }
 
@@ -75,16 +78,23 @@ class ExpenseController extends BaseController
                     'month' => $now->format('n')
                 ]);
             } catch (\Exception $e) {
-                // Handle error - could add flash message or log error
-                // For now, redirect back with error
+                // Log error for debugging
+                error_log('Expense add error: ' . $e->getMessage());
+                error_log('Expense add trace: ' . $e->getTraceAsString());
+                
+                // Add flash message for user feedback
+                $this->addFlash('error', 'Wystąpił błąd podczas dodawania wydatku: ' . $e->getMessage());
+                
                 return $this->redirectToRoute('expenses_add');
             }
         }
 
         $categories = $this->expenseService->getAllCategories();
+        $categoryOptions = $this->expenseService->getCategoriesForSelect();
 
         return $this->renderWithRoutes('expenses/add.html.twig', [
             'categories' => $categories,
+            'categoryOptions' => $categoryOptions,
         ]);
     }
 
@@ -99,16 +109,27 @@ class ExpenseController extends BaseController
             return new JsonResponse(['success' => false], 400);
         }
 
-        $expense = $this->expenseService->updateExpenseStatus($id, $status);
-
-        if ($expense) {
-            return new JsonResponse([
-                'success' => true,
-                'paymentDate' => $expense->getPaymentDate()?->format('Y-m-d') ?: 'N/A'
-            ]);
+        // Sprawdź czy to ID wystąpienia czy wydatku
+        $occurrence = $this->entityManager->find(ExpenseOccurrence::class, $id);
+        
+        if ($occurrence) {
+            // To jest wystąpienie wydatku cyklicznego
+            try {
+                $this->expenseService->updateOccurrencePaymentStatus($id, $status);
+                return new JsonResponse(['success' => true]);
+            } catch (\Exception $e) {
+                return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+            }
+        } else {
+            // To jest zwykły wydatek
+            $expense = $this->expenseService->updateExpenseStatus($id, $status);
+            
+            if ($expense) {
+                return new JsonResponse(['success' => true]);
+            } else {
+                return new JsonResponse(['success' => false], 404);
+            }
         }
-
-        return new JsonResponse(['success' => false], 404);
     }
 
     #[IsGranted('ROLE_USER')]
@@ -153,7 +174,7 @@ class ExpenseController extends BaseController
     public function edit(Request $request, int $id): Response {
         $expense = $this->expenseService->getExpenseById($id);
 
-        if (!$expense || $expense->getUser() !== $this->expenseService->getCurrentUser()) {
+        if (!$expense) {
             throw $this->createNotFoundException('Expense not found');
         }
 
@@ -167,10 +188,12 @@ class ExpenseController extends BaseController
         }
 
         $categories = $this->expenseService->getAllCategories();
+        $categoryOptions = $this->expenseService->getCategoriesForSelect();
 
         return $this->renderWithRoutes('expenses/edit.html.twig', [
             'expense' => $expense,
             'categories' => $categories,
+            'categoryOptions' => $categoryOptions,
         ]);
     }
 

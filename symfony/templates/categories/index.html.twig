@@ -21,14 +21,14 @@
             <table class="table-fixed w-full">
                 <thead>
                 <tr>
-                    <th class="table-header">Id</th>
+                    <th class="table-header w-[10%] md:w-[5%]">Id</th>
                     <th class="table-header">Kategoria</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for category in categories %}
                     <tr>
-                        <td class="table-cell"> {{ category.id }} </td>
+                        <td class="table-cell w-[5%] md:w-[10%]"> {{ category.id }} </td>
                         <td class="table-cell"> {{ category.name }} </td>
                     </tr>
                 {% endfor %}
