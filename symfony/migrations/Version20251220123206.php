@@ -37,14 +37,14 @@ final class Version20251220123206 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        // Drop foreign key FIRST
+        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EXPENSE_OCCURRENCE_USER');
+
         // Drop composite index
         $this->addSql('DROP INDEX idx_occurrence_user_date ON expense_occurrence');
 
         // Drop index
         $this->addSql('DROP INDEX idx_occurrence_user ON expense_occurrence');
-
-        // Drop foreign key
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EXPENSE_OCCURRENCE_USER');
 
         // Drop column
         $this->addSql('ALTER TABLE expense_occurrence DROP COLUMN user_id');

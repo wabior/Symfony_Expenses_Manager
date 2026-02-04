@@ -29,8 +29,13 @@ final class Version20250129073600 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        // Drop foreign key FIRST
         $this->addSql('ALTER TABLE category DROP FOREIGN KEY FK_64C19C1A76ED395');
+        
+        // Drop index
         $this->addSql('DROP INDEX IDX_64C19C1A76ED395 ON category');
+        
+        // Drop column
         $this->addSql('ALTER TABLE category DROP user_id');
     }
 }
