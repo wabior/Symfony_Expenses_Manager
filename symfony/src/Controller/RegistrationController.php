@@ -125,7 +125,9 @@ class RegistrationController extends BaseController
                 ]);
                 $user = new User();
                 $user->setEmail($email);
-                $user->setRoles(null); // NULL means default roles will be applied
+                // Zapisujemy pustą tablicę ról - w encji i tak zawsze zostanie dodane ROLE_USER,
+                // ale w bazie nie będzie problemu z NOT NULL na kolumnie JSON.
+                $user->setRoles([]);
 
                 // Hash the password
                 $hashedPassword = $passwordHasher->hashPassword($user, $password);
