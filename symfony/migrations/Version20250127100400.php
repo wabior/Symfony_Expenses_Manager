@@ -19,19 +19,13 @@ final class Version20250127100400 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Drop name_english column
-        $this->addSql('ALTER TABLE category DROP COLUMN name_english');
-        
-        // Rename name_polish to name
-        $this->addSql('ALTER TABLE category CHANGE name_polish name VARCHAR(255) NOT NULL');
+        // This migration is no longer needed as the category table structure
+        // has been properly defined in Version20250101000001
+        // Category table already has simplified structure (name, user_id)
     }
 
     public function down(Schema $schema): void
     {
-        // Add back name_english column
-        $this->addSql('ALTER TABLE category ADD name_english VARCHAR(255) NOT NULL');
-        
-        // Rename name back to name_polish
-        $this->addSql('ALTER TABLE category CHANGE name name_polish VARCHAR(255) NOT NULL');
+        // This migration is no longer needed - no changes to revert
     }
 }
