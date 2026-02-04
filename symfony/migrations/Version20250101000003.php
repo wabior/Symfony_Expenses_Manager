@@ -44,22 +44,33 @@ final class Version20250101000003 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // Drop foreign key constraints first (they use the indexes)
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EXPENSE_OCCURRENCE_EXPENSE');
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EXPENSE_OCCURRENCE_USER');
+        // Check if table exists before trying to drop constraints/indexes
+        $this->addSql("SET @table_exists = (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'expense_occurrence')");
 
-        // Drop indexes
-        $this->addSql('DROP INDEX idx_expense_recurring ON expense');
-        $this->addSql('DROP INDEX idx_occurrence_status ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_user ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_expense ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_date ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_user_date ON expense_occurrence');
+        // Only drop constraints if table exists and constraints exist
+        $this->addSql("SET @fk_expense_exists = (SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema = DATABASE() AND table_name = 'expense_occurrence' AND constraint_name = 'FK_EXPENSE_OCCURRENCE_EXPENSE')");
+        $this->addSql("SET @fk_user_exists = (SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema = DATABASE() AND table_name = 'expense_occurrence' AND constraint_name = 'FK_EXPENSE_OCCURRENCE_USER')");
+
+        $this->addSql("SET @session_sql_mode = @@SESSION.sql_mode");
+        $this->addSql("SET SESSION sql_mode = ''");
+
+        $this->addSql("DROP FOREIGN KEY IF EXISTS FK_EXPENSE_OCCURRENCE_EXPENSE");
+        $this->addSql("DROP FOREIGN KEY IF EXISTS FK_EXPENSE_OCCURRENCE_USER");
+
+        $this->addSql("SET SESSION sql_mode = @session_sql_mode");
+
+        // Drop indexes (they may or may not exist)
+        $this->addSql('DROP INDEX IF EXISTS idx_expense_recurring ON expense');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_status ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_expense ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_date ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user_date ON expense_occurrence');
 
         // Drop unique constraint
-        $this->addSql('ALTER TABLE expense_occurrence DROP INDEX unique_expense_date');
+        $this->addSql('ALTER TABLE expense_occurrence DROP INDEX IF EXISTS unique_expense_date');
 
         // Drop expense_occurrence table
-        $this->addSql('DROP TABLE expense_occurrence');
+        $this->addSql('DROP TABLE IF EXISTS expense_occurrence');
     }
 }
