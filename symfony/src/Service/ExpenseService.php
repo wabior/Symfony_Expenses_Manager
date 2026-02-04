@@ -4,63 +4,35 @@ namespace App\Service;
 
 use App\Entity\Expense;
 use App\Entity\ExpenseOccurrence;
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Category;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\SecurityBundle\Security;
 
-class ExpenseService
+class ExpenseService extends BaseUserService
 {
-    private EntityManagerInterface $entityManager;
-    private \Symfony\Bundle\SecurityBundle\Security $security;
-
-    public function __construct(EntityManagerInterface $entityManager, Security $security)
-    {
-        $this->entityManager = $entityManager;
-        $this->security = $security;
-    }
-
-    public function getCurrentUser(): User
-    {
-        /** @var User $user */
-        $user = $this->security->getUser();
-        if (!$user) {
-            throw new \LogicException('User must be authenticated');
-        }
-        return $user;
-    }
-
     public function getAllExpenses(): array
     {
-        $user = $this->getCurrentUser();
-        return $this->entityManager->getRepository(Expense::class)->findByUser($user);
+        return $this->findByUser(Expense::class);
     }
-
 
     public function getExpenseById(int $id): ?Expense
     {
-        $user = $this->getCurrentUser();
-
-        $expense = $this->entityManager->getRepository(Expense::class)->findOneBy([
-            'id' => $id,
-            'user' => $user
-        ]);
-
-        return $expense;
+        return $this->findOneByUser(Expense::class, ['id' => $id]);
     }
 
     public function getExpensesByMonth(int $year, int $month): array
     {
+        $user = $this->requireAuthenticatedUser();
         $startDate = new \DateTime("$year-$month-01");
         $endDate = (clone $startDate)->modify('+1 month');
-        $user = $this->getCurrentUser();
 
         return $this->entityManager->getRepository(Expense::class)->findByMonth($startDate, $endDate, $user);
     }
 
     public function addExpense(Request $request): void
     {
+        error_log('ExpenseService::addExpense() called');
+        
         // Basic validation
         $name = trim($request->request->get('name', ''));
         $amount = $request->request->get('amount');
@@ -68,6 +40,9 @@ class ExpenseService
         $paymentStatus = $request->request->get('paymentStatus');
         $categoryId = $request->request->get('category');
         $recurringFrequency = (int) $request->request->get('recurringFrequency', 0);
+
+        error_log('Expense data: name=' . $name . ', amount=' . $amount . ', date=' . $date . ', categoryId=' . $categoryId . ' (type: ' . gettype($categoryId) . ')');
+        error_log('All request data: ' . json_encode($request->request->all()));
 
         if (empty($name)) {
             throw new \InvalidArgumentException('Expense name is required');
@@ -86,6 +61,7 @@ class ExpenseService
         }
 
         if (empty($categoryId)) {
+            error_log('Category validation failed - categoryId is empty');
             throw new \InvalidArgumentException('Category is required');
         }
 
@@ -93,13 +69,12 @@ class ExpenseService
             throw new \InvalidArgumentException('Recurring frequency must be between 0 and 12');
         }
 
-        $expense = new Expense();
+        $expense = $this->createEntityWithUser(Expense::class);
         $expense->setName($name);
         $expense->setAmount($amount);
         $expense->setDate(new \DateTime($date));
         $expense->setPaymentStatus($paymentStatus);
         $expense->setRecurringFrequency($recurringFrequency);
-        $expense->setUser($this->getCurrentUser());
 
         if ($paymentDate = $request->request->get('paymentDate')) {
             $expense->setPaymentDate(new \DateTime($paymentDate));
@@ -107,12 +82,15 @@ class ExpenseService
 
         $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
         if (!$category) {
+            error_log('Category not found for ID: ' . $categoryId);
             throw new \InvalidArgumentException('Invalid category selected');
         }
         $expense->setCategory($category);
 
+        error_log('About to persist expense');
         $this->entityManager->persist($expense);
         $this->entityManager->flush();
+        error_log('Expense persisted with ID: ' . $expense->getId());
 
         // Dla wydatków cyklicznych utwórz wystąpienie w miesiącu dodania
         if ($recurringFrequency > 0) {
@@ -125,10 +103,9 @@ class ExpenseService
 
     public function updateExpenseStatus(int $id, string $status): ?Expense
     {
-        $expense = $this->entityManager->getRepository(Expense::class)->find($id);
-        $user = $this->getCurrentUser();
+        $expense = $this->getExpenseById($id);
 
-        if ($expense && $expense->getUser() === $user) {
+        if ($expense) {
             $expense->setPaymentStatus($status);
 
             if ($status !== 'unpaid') {
@@ -138,7 +115,6 @@ class ExpenseService
             }
 
             $this->entityManager->flush();
-
             return $expense;
         }
 
@@ -147,14 +123,15 @@ class ExpenseService
 
     public function updateExpense(Request $request, int $id): void
     {
-        $expense = $this->entityManager->find(Expense::class, $id);
-        $user = $this->getCurrentUser();
+        $expense = $this->getExpenseById($id);
 
-        if (!$expense || $expense->getUser() !== $user) {
+        if (!$expense) {
             throw new \Exception('Expense not found or access denied');
         }
 
         $data = $request->request->all();
+        $oldRecurringFrequency = $expense->getRecurringFrequency();
+        $newRecurringFrequency = (int) $data['recurringFrequency'];
 
         // Walidacja
         if (empty($data['name'])) {
@@ -169,7 +146,7 @@ class ExpenseService
         $expense->setName($data['name']);
         $expense->setAmount($data['amount']);
         $expense->setDate(new \DateTime($data['date']));
-        $expense->setRecurringFrequency((int) $data['recurringFrequency']);
+        $expense->setRecurringFrequency($newRecurringFrequency);
 
         // Kategoria
         $category = $this->entityManager->getRepository(Category::class)->find($data['category']);
@@ -185,25 +162,65 @@ class ExpenseService
             $expense->setPaymentDate(new \DateTime($data['paymentDate']));
         }
 
+        // Zarządzanie wystąpieniami przy zmianie cyklu
+        if ($oldRecurringFrequency === 0 && $newRecurringFrequency > 0) {
+            // Zmiana z niecyklicznego na cykliczny - utwórz wystąpienie
+            $expenseDate = new \DateTime($data['date']);
+            $occurrence = $this->createExpenseOccurrence($expense, $expenseDate);
+            $this->entityManager->persist($occurrence);
+        } elseif ($oldRecurringFrequency > 0 && $newRecurringFrequency === 0) {
+            // Zmiana z cyklicznego na niecykliczny - usuń wystąpienia
+            $this->deleteExpenseOccurrences($expense);
+        }
+
         $this->entityManager->flush();
     }
 
     public function deleteExpense(int $id): void
     {
-        $expense = $this->entityManager->find(Expense::class, $id);
-        $user = $this->getCurrentUser();
+        $expense = $this->getExpenseById($id);
 
-        if (!$expense || $expense->getUser() !== $user) {
+        if (!$expense) {
             throw new \Exception('Expense not found or access denied');
+        }
+
+        // Usuń wystąpienia jeśli wydatek jest cykliczny
+        if ($expense->getRecurringFrequency() > 0) {
+            $this->deleteExpenseOccurrences($expense);
         }
 
         $this->entityManager->remove($expense);
         $this->entityManager->flush();
     }
 
+    /**
+     * Usuwa wszystkie wystąpienia dla danego wydatku
+     */
+    private function deleteExpenseOccurrences(Expense $expense): void
+    {
+        $occurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
+            ->findBy(['expense' => $expense]);
+
+        foreach ($occurrences as $occurrence) {
+            $this->entityManager->remove($occurrence);
+        }
+    }
+
     public function getAllCategories(): array
     {
-        return $this->entityManager->getRepository(Category::class)->findAll();
+        return $this->findByUser(Category::class);
+    }
+
+    public function getCategoriesForSelect(): array
+    {
+        $categories = $this->getAllCategories();
+        $categoryOptions = [];
+        
+        foreach ($categories as $category) {
+            $categoryOptions[$category->getId()] = $category->getName();
+        }
+        
+        return $categoryOptions;
     }
 
     public function getNavigationMonths(int $year, int $month): array
@@ -244,7 +261,7 @@ class ExpenseService
     {
         $startDate = new \DateTime("$year-$month-01");
         $endDate = (clone $startDate)->modify('+1 month -1 day');
-        $user = $this->getCurrentUser();
+        $user = $this->requireAuthenticatedUser();
 
         // Pobierz wystąpienia wydatków cyklicznych
         $occurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
@@ -274,7 +291,7 @@ class ExpenseService
         $monthStart = new \DateTime("$year-$month-01");
         $monthEnd = (clone $monthStart)->modify('+1 month -1 day');
 
-        $user = $this->getCurrentUser();
+        $user = $this->requireAuthenticatedUser();
         $recurringExpenses = $this->entityManager->getRepository(Expense::class)
             ->findRecurringExpenses($user);
 
@@ -330,11 +347,12 @@ class ExpenseService
     public function updateOccurrencePaymentStatus(int $occurrenceId, string $status, ?\DateTimeInterface $paymentDate = null): void
     {
         $occurrence = $this->entityManager->find(ExpenseOccurrence::class, $occurrenceId);
-        $user = $this->getCurrentUser();
-
-        if (!$occurrence || $occurrence->getExpense()->getUser() !== $user) {
-            throw new \Exception('Expense occurrence not found or access denied');
+        
+        if (!$occurrence) {
+            throw new \Exception('Expense occurrence not found');
         }
+
+        $this->ensureEntityBelongsToUser($occurrence->getExpense());
 
         $occurrence->setPaymentStatus($status);
         if ($paymentDate && $status !== 'unpaid') {
@@ -345,5 +363,4 @@ class ExpenseService
 
         $this->entityManager->flush();
     }
-
 }

@@ -36,7 +36,8 @@ class CategoryController extends BaseController
         $categories = $this->categoryService->getAllCategories();
 
         return $this->renderWithRoutes('categories/index.html.twig', [
-            'categories' => $categories
+            'categories' => $categories,
+            'pageTitle' => 'Kategorie'
         ]);
     }
 
@@ -45,9 +46,8 @@ class CategoryController extends BaseController
     public function add(Request $request): Response
     {
         if ($request->isMethod('POST')) {
-            $nameEnglish = $request->request->get('nameEnglish');
-            $namePolish = $request->request->get('namePolish');
-            $this->categoryService->addCategory($nameEnglish, $namePolish);
+            $name = $request->request->get('name');
+            $this->categoryService->addCategory($name);
 
             return $this->redirectToRoute('categories');
         }
@@ -56,6 +56,7 @@ class CategoryController extends BaseController
 
         return $this->renderWithRoutes('categories/add.html.twig', [
             'categories' => $categories,
+            'pageTitle' => 'Dodaj kategorię'
         ]);
     }
 }

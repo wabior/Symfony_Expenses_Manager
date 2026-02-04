@@ -1,0 +1,17 @@
+{# Komponent select z customową strzałką #}
+<select 
+    id="{{ id|default('select') }}" 
+    name="{{ name|default(id|default('select')) }}" 
+    {% if required is defined %}required{% endif %}
+    class="{{ class|default('') }} h-14 mt-2 block w-full px-4 py-3 pr-12 border-2 border-gray-400 rounded-lg text-lg bg-gray-100 appearance-none cursor-pointer focus:border-blue-500 focus:outline-none transition-all duration-300"
+    style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27M6 8l4 4 4-4%27/%3e%3c/svg%3e'); background-position: right 0.75rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em;"
+>
+    {% if required is defined and show_placeholder is not defined %}
+        <option value="">Wybierz...</option>
+    {% endif %}
+    {% for value, label in options %}
+        <option value="{{ value }}" {% if selected is defined and selected == value %}selected{% endif %}>
+            {{ label }}
+        </option>
+    {% endfor %}
+</select>

@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: "App\Repository\CategoryRepository")]class Category
+#[ORM\Entity(repositoryClass: "App\Repository\CategoryRepository")]
+class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -12,36 +14,37 @@ use Doctrine\ORM\Mapping as ORM;
     private $id;
 
     #[ORM\Column(type: "string", length: 255)]
-    private $nameEnglish;
+    private $name;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private $namePolish;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
 
-// Gettery i settery
+    // Gettery i settery
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNameEnglish(): ?string
+    public function getName(): ?string
     {
-        return $this->nameEnglish;
+        return $this->name;
     }
 
-    public function setNameEnglish(string $nameEnglish): self
+    public function setName(string $name): self
     {
-        $this->nameEnglish = $nameEnglish;
+        $this->name = $name;
         return $this;
     }
 
-    public function getNamePolish(): ?string
+    public function getUser(): User
     {
-        return $this->namePolish;
+        return $this->user;
     }
 
-    public function setNamePolish(string $namePolish): self
+    public function setUser(User $user): self
     {
-        $this->namePolish = $namePolish;
+        $this->user = $user;
         return $this;
     }
 }

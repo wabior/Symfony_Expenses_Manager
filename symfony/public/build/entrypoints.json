@@ -1,0 +1,31 @@
+{
+  "entrypoints": {
+    "app": {
+      "js": [
+        "/build/runtime.js",
+        "/build/app.js"
+      ],
+      "css": [
+        "/build/app.css"
+      ]
+    },
+    "payment_status": {
+      "js": [
+        "/build/runtime.js",
+        "/build/payment_status.js"
+      ]
+    },
+    "expenses_index": {
+      "js": [
+        "/build/runtime.js",
+        "/build/expenses_index.js"
+      ]
+    },
+    "delete_modal": {
+      "js": [
+        "/build/runtime.js",
+        "/build/delete_modal.js"
+      ]
+    }
+  }
+}

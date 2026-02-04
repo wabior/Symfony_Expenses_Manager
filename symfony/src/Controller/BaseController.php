@@ -51,13 +51,13 @@ class BaseController extends AbstractController
 
             $routeName = $route['route_name'];
 
-            // Ukryj admin_menu dla użytkowników bez roli ROLE_ADMIN
-            if ($routeName === 'admin_menu' && !$this->isGranted('ROLE_ADMIN')) {
+            // Ukryj admin dla użytkowników bez roli ROLE_ADMIN
+            if (($routeName === 'admin_menu' || $routeName === 'admin') && !$this->isGranted('ROLE_ADMIN')) {
                 return false;
             }
 
             // Niektóre strony wymagają logowania
-            $requiresAuth = in_array($routeName, ['expenses', 'categories', 'admin_menu']);
+            $requiresAuth = in_array($routeName, ['expenses', 'categories', 'admin_menu', 'admin']);
 
             if ($requiresAuth && !$user) {
                 return false; // Ukryj jeśli wymaga autoryzacji ale użytkownik nie jest zalogowany

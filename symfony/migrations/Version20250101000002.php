@@ -21,7 +21,7 @@ final class Version20250101000002 extends AbstractMigration
     {
         // Insert initial menu data
         $this->addSql("INSERT INTO menu (route_name, friendly_name, path, `order`, activated) VALUES
-            ('home', 'Start', '/', 1, 1),
+            ('home', 'Start', '/', 1, 0),
             ('expenses', 'Wydatki', '/expenses', 2, 1),
             ('categories', 'Kategorie', '/categories', 3, 1),
             ('admin_menu', 'Menu setup', '/admin/menu', 4, 1),
