@@ -14,7 +14,7 @@ class ExpenseOccurrence
     #[ORM\Column(type: "integer")]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Expense::class)]
+    #[ORM\ManyToOne(targetEntity: Expense::class, inversedBy: "occurrences")]
     #[ORM\JoinColumn(nullable: false)]
     private $expense;
 
