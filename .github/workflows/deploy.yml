@@ -16,7 +16,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/symfony
+            cd /home/jaroslawwabich/domains/expenses.jaroslawwabich.smallhost.pl
             git pull origin master
             composer install --no-dev --optimize-autoloader
             php bin/console cache:clear --env=prod
