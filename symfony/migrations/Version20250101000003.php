@@ -44,22 +44,26 @@ final class Version20250101000003 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // Drop existing foreign key constraints (Doctrine-generated names)
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EE9BEFAF395DB7B'); // expense_id
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY FK_EE9BEFAA76ED395'); // user_id
+        // Drop foreign key constraints created by this migration
+        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY IF EXISTS FK_EXPENSE_OCCURRENCE_EXPENSE');
+        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY IF EXISTS FK_EXPENSE_OCCURRENCE_USER');
+
+        // Also try to drop any existing Doctrine-generated constraints (for compatibility)
+        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY IF EXISTS FK_EE9BEFAF395DB7B');
+        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY IF EXISTS FK_EE9BEFAA76ED395');
 
         // Drop indexes
-        $this->addSql('DROP INDEX idx_expense_recurring ON expense');
-        $this->addSql('DROP INDEX idx_occurrence_status ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_user ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_expense ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_date ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_user_date ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_expense_recurring ON expense');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_status ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_expense ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_date ON expense_occurrence');
+        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user_date ON expense_occurrence');
 
         // Drop unique constraint
-        $this->addSql('ALTER TABLE expense_occurrence DROP INDEX unique_expense_date');
+        $this->addSql('ALTER TABLE expense_occurrence DROP INDEX IF EXISTS unique_expense_date');
 
         // Drop expense_occurrence table
-        $this->addSql('DROP TABLE expense_occurrence');
+        $this->addSql('DROP TABLE IF EXISTS expense_occurrence');
     }
 }
