@@ -7,9 +7,23 @@ use App\Entity\ExpenseOccurrence;
 use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExpenseService extends BaseUserService
 {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        TokenStorageInterface $tokenStorage,
+        private readonly CategoryService $categoryService
+    ) {
+        parent::__construct($entityManager, $tokenStorage);
+    }
+
+    public function getDefaultCategoryId(): int
+    {
+        return $this->categoryService->getOrCreateDefaultCategory()->getId();
+    }
+
     public function getAllExpenses(): array
     {
         return $this->findByUser(Expense::class);
@@ -213,10 +227,17 @@ class ExpenseService extends BaseUserService
 
     public function getCategoriesForSelect(): array
     {
+        $defaultCategory = $this->categoryService->getOrCreateDefaultCategory();
         $categories = $this->getAllCategories();
         $categoryOptions = [];
+
+        // Domyślna kategoria zawsze jako pierwsza opcja
+        $categoryOptions[$defaultCategory->getId()] = $defaultCategory->getName();
         
         foreach ($categories as $category) {
+            if ($category->getId() === $defaultCategory->getId()) {
+                continue;
+            }
             $categoryOptions[$category->getId()] = $category->getName();
         }
         
