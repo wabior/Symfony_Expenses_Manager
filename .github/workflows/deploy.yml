@@ -1,14 +1,14 @@
 name: Deploy to Production
 on:
-  pull_request:
-    types: [closed]
-    branches: [master]
   push:
     branches: [master]
+    paths:
+      - 'symfony/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to server
