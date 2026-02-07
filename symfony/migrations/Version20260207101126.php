@@ -31,26 +31,10 @@ final class Version20260207101126 extends AbstractMigration
             ]);
         }
         
-        // Update existing columns
-        $expenseTable = $schema->getTable('expense');
-        $expenseTable->changeColumn('recurring_frequency', [
-            'type' => 'integer',
-            'default' => 0,
-            'notnull' => true
-        ]);
-        
-        $table->changeColumn('payment_status', [
-            'type' => 'string',
-            'length' => 20,
-            'default' => 'unpaid',
-            'notnull' => true
-        ]);
-        
-        $table->changeColumn('created_at', [
-            'type' => 'datetime',
-            'default' => 'CURRENT_TIMESTAMP',
-            'notnull' => true
-        ]);
+        // Update existing columns using raw SQL (proper way for migrations)
+        $this->addSql('ALTER TABLE expense CHANGE recurring_frequency recurring_frequency INT DEFAULT 0 NOT NULL');
+        $this->addSql('ALTER TABLE expense_occurrence CHANGE payment_status payment_status VARCHAR(20) DEFAULT \'unpaid\' NOT NULL');
+        $this->addSql('ALTER TABLE expense_occurrence CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         
         // Create indexes only if they don't exist
         if (!$table->hasIndex('idx_occurrence_user_expense')) {
@@ -69,6 +53,7 @@ final class Version20260207101126 extends AbstractMigration
             $table->addIndex(['user_id', 'expense_id', 'occurrence_date'], 'idx_occurrence_user_expense_date');
         }
         
+        $expenseTable = $schema->getTable('expense');
         if (!$expenseTable->hasIndex('idx_expense_category_amount')) {
             $expenseTable->addIndex(['category_id', 'amount'], 'idx_expense_category_amount');
         }
