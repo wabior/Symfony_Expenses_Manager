@@ -32,7 +32,7 @@ final class Version20250101000001 extends AbstractMigration
         $this->addSql('CREATE TABLE user (
             id INT AUTO_INCREMENT NOT NULL,
             email VARCHAR(180) NOT NULL,
-            roles JSON NOT NULL,
+            roles JSON DEFAULT NULL,
             password VARCHAR(255) NOT NULL,
             UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email),
             PRIMARY KEY(id)
@@ -71,6 +71,15 @@ final class Version20250101000001 extends AbstractMigration
         $this->addSql('ALTER TABLE category ADD CONSTRAINT FK_64C19C1A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE expense ADD CONSTRAINT FK_2D3A8DA612469DE2 FOREIGN KEY (category_id) REFERENCES category (id)');
         $this->addSql('ALTER TABLE expense ADD CONSTRAINT FK_2D3A8DA6A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+
+        // Insert initial menu data
+        $this->addSql("INSERT INTO menu (route_name, friendly_name, path, `order`, activated) VALUES
+            ('home', 'Start', '/', 1, 0),
+            ('expenses', 'Wydatki', '/expenses', 2, 1),
+            ('categories', 'Kategorie', '/categories', 3, 1),
+            ('admin_menu', 'Menu setup', '/admin/menu', 4, 1),
+            ('about', 'O nas', '/about', 5, 1)
+        ");
     }
 
     public function down(Schema $schema): void
@@ -79,6 +88,9 @@ final class Version20250101000001 extends AbstractMigration
         $this->addSql('ALTER TABLE category DROP FOREIGN KEY FK_64C19C1A76ED395');
         $this->addSql('ALTER TABLE expense DROP FOREIGN KEY FK_2D3A8DA6A76ED395');
         $this->addSql('ALTER TABLE expense DROP FOREIGN KEY FK_2D3A8DA612469DE2');
+
+        // Remove all menu entries
+        $this->addSql("DELETE FROM menu WHERE route_name IN ('home', 'expenses', 'categories', 'admin_menu', 'about')");
 
         // Drop tables in reverse order
         $this->addSql('DROP TABLE menu');

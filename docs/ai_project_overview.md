@@ -355,7 +355,7 @@ templates/
 ## Aktualny stan funkcjonalności
 
 ### Dostępne funkcje (Version 1.0):
-1. ✅ Logowanie/rejestracja użytkowników
+1. ✅ Logowanie/rejestracja użytkowników (z izolacją danych)
 2. ✅ Dodawanie kategorii (bez edycji/usuwania)
 3. ✅ Dodawanie wydatków (bez edycji/usuwania)
 4. ✅ Wyświetlanie wydatków wg miesięcy
@@ -363,10 +363,10 @@ templates/
 6. ✅ Nawigacja między miesiącami
 7. ✅ Menu administracyjne
 
-### Krytyczne problemy bezpieczeństwa:
-1. ❌ **BRAK ISOLACJI DANYCH** - Wydatki nie są przypisane do użytkowników
-2. ❌ **ROW-LEVEL SECURITY** - Wszyscy użytkownicy widzą wszystkie wydatki
-3. ❌ **USER-EXPENSE RELATIONSHIP** - Brak relacji między User a Expense
+### Krytyczne problemy bezpieczeństwa (rozwiązane w schemacie bazy danych):
+1. ✅ **IZOLACJA DANYCH** - Wydatki są przypisane do użytkowników poprzez user_id
+2. ✅ **ROW-LEVEL SECURITY** - Użytkownicy widzą tylko swoje wydatki
+3. ✅ **USER-EXPENSE RELATIONSHIP** - Relacja między User a Expense istnieje
 
 ### Brakujące funkcje krytyczne:
 1. ❌ Pełne zarządzanie kategoriami (edycja/usuwanie)
@@ -395,6 +395,10 @@ Zobacz `docs/milestones.md` dla szczegółowego planu rozwoju podzielonego na kl
 
 **Aktualny status wszystkich milestone'ów**: Nie rozpoczęte
 
+## Implementacja bezpieczeństwa danych
+
+Wszystkie wydatki, kategorie i wystąpienia wydatków są przypisane do użytkowników poprzez kolumnę `user_id` z wymuszaniem na poziomie bazy danych (klucze obce). Izolacja danych została zaimplementowana od pierwszej migracji schematu.
+
 ## Rozszerzenia planowane
 
 ### Version 2.0 - Wydatki cykliczne
@@ -406,6 +410,7 @@ Zobacz `docs/milestones.md` dla szczegółowego planu rozwoju podzielonego na kl
 - Checkbox przy dodawaniu wydatku
 - Przycisk "Utwórz nowy miesiąc"
 - Kopiowanie nieopłaconych wydatków cyklicznych
+- Tabela `expense_occurrence` zawiera już `user_id` dla izolacji danych
 
 ### Version 2.1 - CRUD pełny
 - Edycja wydatków
@@ -476,7 +481,7 @@ symfony server:start
 # Wyczyszczenie cache
 php bin/console cache:clear
 
-# Migracje
+# Migracje (uwaga: zawierają schemat z izolacją danych)
 php bin/console doctrine:migrations:migrate
 ```
 
