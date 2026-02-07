@@ -19,8 +19,11 @@ final class Version20260207101126 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Add amount column to expense_occurrence table with default value (only if not exists)
-        $this->addSql('ALTER TABLE expense_occurrence ADD COLUMN IF NOT EXISTS amount NUMERIC(10, 2) DEFAULT \'0.00\' NOT NULL');
+        // Add amount column to expense_occurrence table with default value (check if exists first)
+        $this->addSql('SET @column_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = \'expense_occurrence\' AND column_name = \'amount\')');
+        $this->addSql('SET @sql = IF(@column_exists = 0, \'ALTER TABLE expense_occurrence ADD amount NUMERIC(10, 2) DEFAULT \\\'0.00\\\' NOT NULL\', \'SELECT \\\"Column amount already exists\\\"\')');
+        $this->addSql('PREPARE stmt FROM @sql');
+        $this->addSql('EXECUTE stmt');
         
         // Change existing columns with defaults
         $this->addSql('ALTER TABLE expense CHANGE recurring_frequency recurring_frequency INT DEFAULT 0 NOT NULL');
