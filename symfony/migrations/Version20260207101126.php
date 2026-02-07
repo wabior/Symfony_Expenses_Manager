@@ -19,15 +19,11 @@ final class Version20260207101126 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP INDEX idx_expense_recurring ON expense');
+        // Add amount column to expense_occurrence table with default value
+        $this->addSql('ALTER TABLE expense_occurrence ADD amount NUMERIC(10, 2) DEFAULT \'0.00\' NOT NULL');
+        
+        // Change existing columns with defaults
         $this->addSql('ALTER TABLE expense CHANGE recurring_frequency recurring_frequency INT DEFAULT 0 NOT NULL');
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY `FK_EXPENSE_OCCURRENCE_EXPENSE`');
-        $this->addSql('ALTER TABLE expense_occurrence DROP FOREIGN KEY `FK_EXPENSE_OCCURRENCE_USER`');
-        $this->addSql('DROP INDEX idx_occurrence_status ON expense_occurrence');
-        $this->addSql('DROP INDEX unique_expense_date ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_user_date ON expense_occurrence');
-        $this->addSql('DROP INDEX idx_occurrence_date ON expense_occurrence');
         $this->addSql('ALTER TABLE expense_occurrence CHANGE payment_status payment_status VARCHAR(20) DEFAULT \'unpaid\' NOT NULL, CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         
         // Optimized composite indexes for query performance
