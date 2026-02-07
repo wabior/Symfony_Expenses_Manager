@@ -19,29 +19,67 @@ final class Version20260207101126 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Add amount column to expense_occurrence table with default value (check if exists first)
-        $this->addSql('SET @column_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = \'expense_occurrence\' AND column_name = \'amount\')');
-        $this->addSql('SET @sql = IF(@column_exists = 0, \'ALTER TABLE expense_occurrence ADD amount NUMERIC(10, 2) DEFAULT \\\'0.00\\\' NOT NULL\', \'SELECT \\\"Column amount already exists\\\"\')');
-        $this->addSql('PREPARE stmt FROM @sql');
-        $this->addSql('EXECUTE stmt');
+        $table = $schema->getTable('expense_occurrence');
         
-        // Change existing columns with defaults
-        $this->addSql('ALTER TABLE expense CHANGE recurring_frequency recurring_frequency INT DEFAULT 0 NOT NULL');
-        $this->addSql('ALTER TABLE expense_occurrence CHANGE payment_status payment_status VARCHAR(20) DEFAULT \'unpaid\' NOT NULL, CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
+        // Add amount column only if it doesn't exist
+        if (!$table->hasColumn('amount')) {
+            $table->addColumn('amount', 'decimal', [
+                'precision' => 10,
+                'scale' => 2,
+                'notnull' => true,
+                'default' => '0.00'
+            ]);
+        }
         
-        // Optimized composite indexes for query performance (with IF NOT EXISTS)
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_expense ON expense_occurrence (user_id, expense_id) COMMENT "Composite index for finding user occurrences by expense"');
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_date ON expense_occurrence (user_id, occurrence_date) COMMENT "Composite index for monthly occurrence queries by user"');
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_expense_date ON expense_occurrence (expense_id, occurrence_date) COMMENT "Composite index for bulk updates by expense and date"');
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_status_date ON expense_occurrence (user_id, payment_status, occurrence_date) COMMENT "Composite index for filtering paid/unpaid occurrences"');
+        // Update existing columns
+        $expenseTable = $schema->getTable('expense');
+        $expenseTable->changeColumn('recurring_frequency', [
+            'type' => 'integer',
+            'default' => 0,
+            'notnull' => true
+        ]);
         
-        // Additional indexes for sorting and complex queries (with IF NOT EXISTS)
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_expense_date ON expense_occurrence (user_id, expense_id, occurrence_date) COMMENT "Composite index for complex queries by user, expense and date"');
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_expense_category_amount ON expense (category_id, amount) COMMENT "Index for sorting expenses by category and amount"');
+        $table->changeColumn('payment_status', [
+            'type' => 'string',
+            'length' => 20,
+            'default' => 'unpaid',
+            'notnull' => true
+        ]);
         
-        // Foreign key constraints with readable names
-        $this->addSql('ALTER TABLE expense_occurrence ADD CONSTRAINT fk_occurrence_expense FOREIGN KEY (expense_id) REFERENCES expense (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE expense_occurrence ADD CONSTRAINT fk_occurrence_user FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
+        $table->changeColumn('created_at', [
+            'type' => 'datetime',
+            'default' => 'CURRENT_TIMESTAMP',
+            'notnull' => true
+        ]);
+        
+        // Create indexes only if they don't exist
+        if (!$table->hasIndex('idx_occurrence_user_expense')) {
+            $table->addIndex(['user_id', 'expense_id'], 'idx_occurrence_user_expense');
+        }
+        if (!$table->hasIndex('idx_occurrence_user_date')) {
+            $table->addIndex(['user_id', 'occurrence_date'], 'idx_occurrence_user_date');
+        }
+        if (!$table->hasIndex('idx_occurrence_expense_date')) {
+            $table->addIndex(['expense_id', 'occurrence_date'], 'idx_occurrence_expense_date');
+        }
+        if (!$table->hasIndex('idx_occurrence_user_status_date')) {
+            $table->addIndex(['user_id', 'payment_status', 'occurrence_date'], 'idx_occurrence_user_status_date');
+        }
+        if (!$table->hasIndex('idx_occurrence_user_expense_date')) {
+            $table->addIndex(['user_id', 'expense_id', 'occurrence_date'], 'idx_occurrence_user_expense_date');
+        }
+        
+        if (!$expenseTable->hasIndex('idx_expense_category_amount')) {
+            $expenseTable->addIndex(['category_id', 'amount'], 'idx_expense_category_amount');
+        }
+        
+        // Add foreign keys only if they don't exist
+        if (!$table->hasForeignKey('fk_occurrence_expense')) {
+            $table->addForeignKeyConstraint('expense', ['expense_id'], ['id'], ['onDelete' => 'CASCADE'], 'fk_occurrence_expense');
+        }
+        if (!$table->hasForeignKey('fk_occurrence_user')) {
+            $table->addForeignKeyConstraint('user', ['user_id'], ['id'], ['onDelete' => 'CASCADE'], 'fk_occurrence_user');
+        }
     }
 
     public function down(Schema $schema): void
