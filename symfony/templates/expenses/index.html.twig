@@ -85,13 +85,13 @@
 									<div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center mr-3">
 										<span class="text-white text-xs font-bold">{{ expense.name|slice(0, 1)|upper }}</span>
 									</div>
-									<a href="{{ path('expenses_edit', {id: (isOccurrence ? item.expense.id : expense.id)}) }}">
+									<a href="{{ path('expenses_edit', {id: itemId}) }}">
 										{{ expense.name }}
 									</a>
 								</div>
 							</td>
 							<td class="table-cell font-semibold text-end ">
-								{{ expense.amount|number_format(2, ',', ' ') }}
+								{{ (isOccurrence ? item.amount : expense.amount)|number_format(2, ',', ' ') }}
 								zł
 							</td>
 							<td class="table-cell">

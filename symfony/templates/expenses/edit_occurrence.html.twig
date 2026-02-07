@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Edytuj wystąpienie wydatku
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto mt-4 xl:w-1/3">
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">
+        Edytuj wystąpienie wydatku
+    </h1>
+
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
+        <strong>Wydatek:</strong> {{ occurrence.expense.name }}<br>
+        <strong>Data wystąpienia:</strong> {{ occurrence.occurrenceDate|date('Y-m-d') }}<br>
+        <strong>Kategoria:</strong> {{ occurrence.expense.category.name }}
+    </div>
+
+    <form action="{{ path('expenses_edit', {id: occurrence.id}) }}"
+        method="post" class="space-y-6 bg-white/25 p-8 shadow-xl rounded-lg">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
+
+        <div>
+            <label for="amount" class="block text-lg font-semibold text-gray-800">Kwota:</label>
+            <input type="number" id="amount" name="amount" step="0.01" required
+                value="{{ occurrence.amount }}"
+                class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <input type="checkbox" id="apply_to_future" name="apply_to_future" value="1"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="apply_to_future" class="ml-2 block text-sm text-gray-900">
+                    <strong>Zastosuj do wszystkich wystąpień od tej daty wzwyż</strong>
+                </label>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                Zaznaczenie tej opcji zaktualizuje kwotę domyślną wydatku oraz wszystkie przyszłe wystąpienia od {{ occurrence.occurrenceDate|date('Y-m-d') }}.
+            </p>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">
+                Zaktualizuj wystąpienie
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

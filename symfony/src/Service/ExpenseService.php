@@ -271,6 +271,7 @@ class ExpenseService extends BaseUserService
         $occurrence->setUser($expense->getUser());
         $occurrence->setOccurrenceDate($date);
         $occurrence->setPaymentStatus('unpaid');
+        $occurrence->setAmount($expense->getAmount());
 
         return $occurrence;
     }
@@ -360,6 +361,21 @@ class ExpenseService extends BaseUserService
             ($toDate->format('n') - $fromDate->format('n'));
 
         return $monthsDiff % $frequency === 0;
+    }
+
+    /**
+     * Aktualizuje kwotę wszystkich wystąpień wydatku od podanej daty wzwyż
+     */
+    public function updateOccurrencesFromDate(Expense $expense, \DateTimeInterface $fromDate, string $newAmount): void
+    {
+        $occurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
+            ->findByExpenseAndDateRange($expense, $fromDate, new \DateTime('2100-01-01')); // Future date to get all occurrences from fromDate
+
+        foreach ($occurrences as $occurrence) {
+            $occurrence->setAmount($newAmount);
+        }
+
+        $this->entityManager->flush();
     }
 
     /**

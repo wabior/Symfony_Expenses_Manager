@@ -32,6 +32,9 @@ class ExpenseOccurrence
     #[ORM\Column(type: "date", nullable: true)]
     private $paymentDate;
 
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2, nullable: false)]
+    private $amount;
+
     #[ORM\Column(type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $createdAt;
 
@@ -100,6 +103,17 @@ class ExpenseOccurrence
     public function setPaymentDate(?\DateTimeInterface $paymentDate): self
     {
         $this->paymentDate = $paymentDate;
+        return $this;
+    }
+
+    public function getAmount(): ?string
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(string $amount): self
+    {
+        $this->amount = $amount;
         return $this;
     }
 
