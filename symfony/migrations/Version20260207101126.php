@@ -19,22 +19,22 @@ final class Version20260207101126 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Add amount column to expense_occurrence table with default value
-        $this->addSql('ALTER TABLE expense_occurrence ADD amount NUMERIC(10, 2) DEFAULT \'0.00\' NOT NULL');
+        // Add amount column to expense_occurrence table with default value (only if not exists)
+        $this->addSql('ALTER TABLE expense_occurrence ADD COLUMN IF NOT EXISTS amount NUMERIC(10, 2) DEFAULT \'0.00\' NOT NULL');
         
         // Change existing columns with defaults
         $this->addSql('ALTER TABLE expense CHANGE recurring_frequency recurring_frequency INT DEFAULT 0 NOT NULL');
         $this->addSql('ALTER TABLE expense_occurrence CHANGE payment_status payment_status VARCHAR(20) DEFAULT \'unpaid\' NOT NULL, CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         
-        // Optimized composite indexes for query performance
-        $this->addSql('CREATE INDEX idx_occurrence_user_expense ON expense_occurrence (user_id, expense_id) COMMENT "Composite index for finding user occurrences by expense"');
-        $this->addSql('CREATE INDEX idx_occurrence_user_date ON expense_occurrence (user_id, occurrence_date) COMMENT "Composite index for monthly occurrence queries by user"');
-        $this->addSql('CREATE INDEX idx_occurrence_expense_date ON expense_occurrence (expense_id, occurrence_date) COMMENT "Composite index for bulk updates by expense and date"');
-        $this->addSql('CREATE INDEX idx_occurrence_user_status_date ON expense_occurrence (user_id, payment_status, occurrence_date) COMMENT "Composite index for filtering paid/unpaid occurrences"');
+        // Optimized composite indexes for query performance (with IF NOT EXISTS)
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_expense ON expense_occurrence (user_id, expense_id) COMMENT "Composite index for finding user occurrences by expense"');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_date ON expense_occurrence (user_id, occurrence_date) COMMENT "Composite index for monthly occurrence queries by user"');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_expense_date ON expense_occurrence (expense_id, occurrence_date) COMMENT "Composite index for bulk updates by expense and date"');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_status_date ON expense_occurrence (user_id, payment_status, occurrence_date) COMMENT "Composite index for filtering paid/unpaid occurrences"');
         
-        // Additional indexes for sorting and complex queries
-        $this->addSql('CREATE INDEX idx_occurrence_user_expense_date ON expense_occurrence (user_id, expense_id, occurrence_date) COMMENT "Composite index for complex queries by user, expense and date"');
-        $this->addSql('CREATE INDEX idx_expense_category_amount ON expense (category_id, amount) COMMENT "Index for sorting expenses by category and amount"');
+        // Additional indexes for sorting and complex queries (with IF NOT EXISTS)
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_occurrence_user_expense_date ON expense_occurrence (user_id, expense_id, occurrence_date) COMMENT "Composite index for complex queries by user, expense and date"');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_expense_category_amount ON expense (category_id, amount) COMMENT "Index for sorting expenses by category and amount"');
         
         // Foreign key constraints with readable names
         $this->addSql('ALTER TABLE expense_occurrence ADD CONSTRAINT fk_occurrence_expense FOREIGN KEY (expense_id) REFERENCES expense (id) ON DELETE CASCADE');
