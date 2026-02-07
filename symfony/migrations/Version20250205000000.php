@@ -19,13 +19,13 @@ final class Version20250205000000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Drop indexes if they exist
-        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_date ON expense_occurrence');
-        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_expense ON expense_occurrence');
-        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user ON expense_occurrence');
-        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_status ON expense_occurrence');
-        $this->addSql('DROP INDEX IF EXISTS idx_occurrence_user_date ON expense_occurrence');
-        $this->addSql('DROP INDEX IF EXISTS idx_expense_recurring ON expense');
+        // Drop indexes (should exist from old migrations)
+        $this->addSql('DROP INDEX idx_occurrence_date ON expense_occurrence');
+        $this->addSql('DROP INDEX idx_occurrence_expense ON expense_occurrence');
+        $this->addSql('DROP INDEX idx_occurrence_user ON expense_occurrence');
+        $this->addSql('DROP INDEX idx_occurrence_status ON expense_occurrence');
+        $this->addSql('DROP INDEX idx_occurrence_user_date ON expense_occurrence');
+        $this->addSql('DROP INDEX idx_expense_recurring ON expense');
     }
 
     public function down(Schema $schema): void
