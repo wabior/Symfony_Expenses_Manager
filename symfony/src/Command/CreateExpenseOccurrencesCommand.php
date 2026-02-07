@@ -13,8 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:create-expense-occurrences',
-    description: 'Create expense occurrences for existing recurring expenses that don\'t have them',
+    name: 'app:update-expense-occurrences-amounts',
+    description: 'Update amounts in existing expense occurrences that have zero/null amounts',
 )]
 class CreateExpenseOccurrencesCommand extends Command
 {
@@ -29,93 +29,57 @@ class CreateExpenseOccurrencesCommand extends Command
     {
         $this
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be done without making changes')
-            ->addOption('months-back', null, InputOption::VALUE_OPTIONAL, 'Number of months back to create occurrences for', 3)
-            ->setHelp('This command creates expense occurrences for existing recurring expenses that don\'t have occurrences yet.');
+            ->setHelp('This command updates amounts in existing expense occurrences that have zero or null amounts by copying from their parent expense.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $dryRun = $input->getOption('dry-run');
-        $monthsBack = (int) $input->getOption('months-back');
 
         if ($dryRun) {
             $io->warning('DRY RUN MODE - No changes will be made');
         }
 
-        $io->title('Creating Expense Occurrences for Existing Recurring Expenses');
+        $io->title('Updating Amounts in Existing Expense Occurrences');
 
-        // Find all recurring expenses
-        $recurringExpenses = $this->entityManager->getRepository(Expense::class)
-            ->createQueryBuilder('e')
-            ->where('e.recurringFrequency > 0')
+        // Find all occurrences with zero or null amounts
+        $occurrencesWithZeroAmount = $this->entityManager->getRepository(\App\Entity\ExpenseOccurrence::class)
+            ->createQueryBuilder('o')
+            ->where('o.amount IS NULL OR o.amount = 0')
             ->getQuery()
             ->getResult();
 
-        $io->info(sprintf('Found %d recurring expenses', count($recurringExpenses)));
+        $io->info(sprintf('Found %d expense occurrences with zero/null amounts', count($occurrencesWithZeroAmount)));
 
-        $createdCount = 0;
-        $skippedCount = 0;
+        $updatedCount = 0;
 
-        foreach ($recurringExpenses as $expense) {
-            $io->section(sprintf('Processing expense: %s (ID: %d)', $expense->getName(), $expense->getId()));
+        foreach ($occurrencesWithZeroAmount as $occurrence) {
+            $expense = $occurrence->getExpense();
+            $oldAmount = $occurrence->getAmount();
+            $newAmount = $expense->getAmount();
 
-            // Calculate date range for occurrences
-            $endDate = new \DateTime();
-            $startDate = (clone $endDate)->modify("-{$monthsBack} months");
-            $startDate->setDate($startDate->format('Y'), $startDate->format('m'), 1); // First day of month
+            $io->text(sprintf(
+                'Updating occurrence ID %d for expense "%s": %s → %s',
+                $occurrence->getId(),
+                $expense->getName(),
+                $oldAmount ?? 'NULL',
+                $newAmount
+            ));
 
-            $io->text(sprintf('Creating occurrences from %s to %s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d')));
-
-            $occurrencesCreated = 0;
-
-            // Create occurrences for each month in the range
-            $currentDate = clone $startDate;
-            while ($currentDate <= $endDate) {
-                // Check if occurrence already exists for this expense and date
-                $existingOccurrence = $this->entityManager->getRepository(\App\Entity\ExpenseOccurrence::class)
-                    ->findOneBy([
-                        'expense' => $expense,
-                        'occurrenceDate' => $currentDate,
-                    ]);
-
-                if ($existingOccurrence) {
-                    $io->text(sprintf('  - Occurrence already exists for %s', $currentDate->format('Y-m')));
-                    $skippedCount++;
-                } else {
-                    if (!$dryRun) {
-                        $occurrence = $this->expenseService->createExpenseOccurrence($expense, $currentDate);
-                        $this->entityManager->persist($occurrence);
-                        $io->text(sprintf('  + Created occurrence for %s with amount %s', $currentDate->format('Y-m'), $occurrence->getAmount()));
-                        $occurrencesCreated++;
-                        $createdCount++;
-                    } else {
-                        $io->text(sprintf('  + Would create occurrence for %s with amount %s', $currentDate->format('Y-m'), $expense->getAmount()));
-                        $occurrencesCreated++;
-                        $createdCount++;
-                    }
-                }
-
-                // Move to next occurrence based on frequency
-                $currentDate->modify("+{$expense->getRecurringFrequency()} month");
-            }
-
-            if ($occurrencesCreated > 0) {
-                $io->success(sprintf('Created %d occurrences for expense "%s"', $occurrencesCreated, $expense->getName()));
+            if (!$dryRun) {
+                $occurrence->setAmount($newAmount);
+                $updatedCount++;
             } else {
-                $io->note('No new occurrences needed for this expense');
+                $updatedCount++;
             }
         }
 
         if (!$dryRun) {
             $this->entityManager->flush();
-            $io->success(sprintf('Successfully created %d expense occurrences', $createdCount));
+            $io->success(sprintf('Successfully updated amounts in %d expense occurrences', $updatedCount));
         } else {
-            $io->success(sprintf('Would create %d expense occurrences (dry run)', $createdCount));
-        }
-
-        if ($skippedCount > 0) {
-            $io->note(sprintf('%d occurrences were skipped (already existed)', $skippedCount));
+            $io->success(sprintf('Would update amounts in %d expense occurrences (dry run)', $updatedCount));
         }
 
         return Command::SUCCESS;
