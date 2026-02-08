@@ -106,13 +106,11 @@ class ExpenseService extends BaseUserService
         $this->entityManager->flush();
         error_log('Expense persisted with ID: ' . $expense->getId());
 
-        // Dla wydatków cyklicznych utwórz wystąpienie w miesiącu dodania
-        if ($recurringFrequency > 0) {
-            $expenseDate = new \DateTime($date);
-            $occurrence = $this->createExpenseOccurrence($expense, $expenseDate);
-            $this->entityManager->persist($occurrence);
-            $this->entityManager->flush();
-        }
+        // Utwórz wystąpienie dla wydatku w miesiącu dodania
+        $expenseDate = new \DateTime($date);
+        $occurrence = $this->createExpenseOccurrence($expense, $expenseDate);
+        $this->entityManager->persist($occurrence);
+        $this->entityManager->flush();
     }
 
     public function updateExpenseStatus(int $id, string $status): ?Expense
@@ -135,75 +133,30 @@ class ExpenseService extends BaseUserService
         return null;
     }
 
-    public function updateExpense(Request $request, int $id): void
+    public function deleteExpense(int $occurrenceId): void
     {
-        $expense = $this->getExpenseById($id);
+        $occurrence = $this->entityManager->find(ExpenseOccurrence::class, $occurrenceId);
 
-        if (!$expense) {
-            throw new \Exception('Expense not found or access denied');
+        if (!$occurrence) {
+            throw new \Exception('Expense occurrence not found');
         }
 
-        $data = $request->request->all();
-        $oldRecurringFrequency = $expense->getRecurringFrequency();
-        $newRecurringFrequency = (int) $data['recurringFrequency'];
+        $this->ensureEntityBelongsToUser($occurrence->getExpense());
 
-        // Walidacja
-        if (empty($data['name'])) {
-            throw new \InvalidArgumentException('Name required');
+        $expense = $occurrence->getExpense();
+
+        // Usuń wystąpienie
+        $this->entityManager->remove($occurrence);
+
+        // Sprawdź czy wydatek ma jeszcze jakieś wystąpienia
+        $remainingOccurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
+            ->findBy(['expense' => $expense]);
+
+        // Jeśli wydatek nie ma już żadnych wystąpień, usuń także wydatek
+        if (empty($remainingOccurrences)) {
+            $this->entityManager->remove($expense);
         }
 
-        if (empty($data['amount']) || !is_numeric($data['amount'])) {
-            throw new \InvalidArgumentException('Amount required');
-        }
-
-        // Aktualizacja pól
-        $expense->setName($data['name']);
-        $expense->setAmount($data['amount']);
-        $expense->setDate(new \DateTime($data['date']));
-        $expense->setRecurringFrequency($newRecurringFrequency);
-
-        // Kategoria
-        $category = $this->entityManager->getRepository(Category::class)->find($data['category']);
-
-        if (!$category) {
-            throw new \InvalidArgumentException('Invalid category selected');
-        }
-
-        $expense->setCategory($category);
-
-        // Data płatności
-        if (!empty($data['paymentDate'])) {
-            $expense->setPaymentDate(new \DateTime($data['paymentDate']));
-        }
-
-        // Zarządzanie wystąpieniami przy zmianie cyklu
-        if ($oldRecurringFrequency === 0 && $newRecurringFrequency > 0) {
-            // Zmiana z niecyklicznego na cykliczny - utwórz wystąpienie
-            $expenseDate = new \DateTime($data['date']);
-            $occurrence = $this->createExpenseOccurrence($expense, $expenseDate);
-            $this->entityManager->persist($occurrence);
-        } elseif ($oldRecurringFrequency > 0 && $newRecurringFrequency === 0) {
-            // Zmiana z cyklicznego na niecykliczny - usuń wystąpienia
-            $this->deleteExpenseOccurrences($expense);
-        }
-
-        $this->entityManager->flush();
-    }
-
-    public function deleteExpense(int $id): void
-    {
-        $expense = $this->getExpenseById($id);
-
-        if (!$expense) {
-            throw new \Exception('Expense not found or access denied');
-        }
-
-        // Usuń wystąpienia jeśli wydatek jest cykliczny
-        if ($expense->getRecurringFrequency() > 0) {
-            $this->deleteExpenseOccurrences($expense);
-        }
-
-        $this->entityManager->remove($expense);
         $this->entityManager->flush();
     }
 
@@ -218,6 +171,36 @@ class ExpenseService extends BaseUserService
         foreach ($occurrences as $occurrence) {
             $this->entityManager->remove($occurrence);
         }
+    }
+
+    /**
+     * Czyści sieroty - wydatki bez żadnych wystąpień
+     */
+    public function cleanupOrphanedExpenses(): int
+    {
+        $user = $this->requireAuthenticatedUser();
+        
+        // Znajdź wszystkie wydatki użytkownika
+        $allExpenses = $this->findByUser(Expense::class);
+        $removedCount = 0;
+
+        foreach ($allExpenses as $expense) {
+            // Sprawdź czy wydatek ma jakieś wystąpienia
+            $occurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
+                ->findBy(['expense' => $expense]);
+
+            if (empty($occurrences)) {
+                // Wydatek nie ma wystąpień - usuń go
+                $this->entityManager->remove($expense);
+                $removedCount++;
+            }
+        }
+
+        if ($removedCount > 0) {
+            $this->entityManager->flush();
+        }
+
+        return $removedCount;
     }
 
     public function getAllCategories(): array
@@ -277,7 +260,7 @@ class ExpenseService extends BaseUserService
     }
 
     /**
-     * Pobiera wystąpienia wydatków i bezpośrednie wydatki niecykliczne dla danego miesiąca
+     * Pobiera wystąpienia wydatków dla danego miesiąca
      */
     public function getExpenseOccurrencesByMonth(int $year, int $month): array
     {
@@ -285,24 +268,11 @@ class ExpenseService extends BaseUserService
         $endDate = (clone $startDate)->modify('+1 month -1 day');
         $user = $this->requireAuthenticatedUser();
 
-        // Pobierz wystąpienia wydatków cyklicznych
+        // Pobierz wszystkie wystąpienia wydatków dla tego miesiąca
         $occurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)
             ->findWithExpenseData($startDate, $endDate, $user);
 
-        // Pobierz wydatki niecykliczne dla tego miesiąca
-        $nonRecurringExpenses = $this->entityManager->getRepository(Expense::class)
-            ->findByMonth($startDate, $endDate, $user);
-
-        // Filtruj tylko wydatki niecykliczne (bez wystąpień)
-        $nonRecurringWithoutOccurrences = [];
-        foreach ($nonRecurringExpenses as $expense) {
-            if ($expense->getRecurringFrequency() === 0) {
-                $nonRecurringWithoutOccurrences[] = $expense;
-            }
-        }
-
-        // Połącz wyniki - wystąpienia + wydatki niecykliczne
-        return array_merge($occurrences, $nonRecurringWithoutOccurrences);
+        return $occurrences;
     }
 
     /**

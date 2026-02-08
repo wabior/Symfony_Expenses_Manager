@@ -98,7 +98,7 @@ abstract class BaseUserService
     /**
      * Sprawdza czy encja należy do zalogowanego użytkownika
      */
-    protected function ensureEntityBelongsToUser(object $entity): void
+    public function ensureEntityBelongsToUser(object $entity): void
     {
         if (!method_exists($entity, 'getUser')) {
             return;

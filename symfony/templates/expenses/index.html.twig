@@ -64,14 +64,13 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for item in expenses %}
-						{% set isOccurrence = item.expense is defined %}
-						{% set expense = isOccurrence ? item.expense : item %}
-						{% set itemId = isOccurrence ? item.id : expense.id %}
-						{% set itemDate = isOccurrence ? item.occurrenceDate : expense.date %}
-						{% set itemStatus = isOccurrence ? item.paymentStatus : expense.paymentStatus %}
+					{% for occurrence in expenses %}
+						{% set expense = occurrence.expense %}
+						{% set itemId = occurrence.id %}
+						{% set itemDate = occurrence.occurrenceDate %}
+						{% set itemStatus = occurrence.paymentStatus %}
 
-						<tr id="{% if isOccurrence %}occurrence-{{ itemId }}{% else %}expense-{{ itemId }}{% endif %}" {% if expense.isRecurring %} class="recurring-expense" {% endif %} class="hover:bg-blue-50/50 transition-colors duration-200">
+						<tr id="occurrence-{{ itemId }}" {% if expense.isRecurring %} class="recurring-expense" {% endif %} class="hover:bg-blue-50/50 transition-colors duration-200">
 							<td class="table-cell font-medium">
 								<div class="flex items-center">
 									<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
@@ -91,7 +90,7 @@
 								</div>
 							</td>
 							<td class="table-cell font-semibold text-end ">
-								{{ (isOccurrence ? item.amount : expense.amount)|number_format(2, ',', ' ') }}
+								{{ occurrence.amount|number_format(2, ',', ' ') }}
 								zł
 							</td>
 							<td class="table-cell">
@@ -110,7 +109,7 @@
 									<span>{{ expense.recurringFrequency ?? ''}}</span>
 								{% endif %}
 							</td>
-							<td class="table-cell status-cell cursor-pointer relative" data-id="{{ itemId }}" data-type="{% if isOccurrence %}occurrence{% else %}expense{% endif %}">
+							<td class="table-cell status-cell cursor-pointer relative" data-id="{{ itemId }}" data-type="occurrence">
 								<div class="flex items-center justify-between">
 									<span class="status-text font-semibold
 											{% if itemStatus == 'unpaid'%} status-unpaid {% endif %}
