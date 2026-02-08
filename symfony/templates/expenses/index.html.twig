@@ -33,13 +33,20 @@
 
 				<!-- Actions -->
 				<div class="flex flex-wrap gap-3">
-					{% include 'components/button.html.twig' with {
-						href: path('expenses_add'),
-						text: 'Dodaj wydatek',
-						icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>'
-					} %}
+					<a href="{{ path('expenses_add') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+						<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+						</svg>
+						Dodaj wydatek
+					</a>
 					<form action="{{ path('expenses_import_recurring', { year: year, month: month }) }}" method="post" style="display: inline;">
 						<input type="hidden" name="_token" value="{{ csrf_token('import_recurring') }}">
+						<button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200">
+							<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+							</svg>
+							Importuj cykliczne
+						</button>
 						{% include 'components/button.html.twig' with {
 							text: 'Importuj cykliczne',
 							icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>',
@@ -146,14 +153,16 @@
 								</select>
 							</td>
 							<td class="table-cell text-center">
-								<form action="{{ path('expenses_delete', {id: itemId}) }}" method="post" class="inline-block" onsubmit="return confirm('Czy na pewno chcesz usunąć ten wydatek?')">
-									<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ itemId) }}">
-									<button type="submit" class="text-gray-500 hover:text-red-600 p-2 rounded-lg transition-colors duration-200" title="Usuń wydatek">
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-										</svg>
-									</button>
-								</form>
+								<button type="button"
+									onclick="showDeleteConfirm('{{ itemId }}', '{{ expense.name|e('js') }}', '{{ occurrence.amount|number_format(2, ',', ' ')|e('js') }}', '{{ occurrence.occurrenceDate|date('d.m.Y')|e('js') }}', '{{ expense.isRecurring() ? 'true' : 'false' }}')"
+									class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+									aria-label="Usuń wydatek: {{ expense.name }} z dnia {{ occurrence.occurrenceDate|date('d.m.Y') }}"
+									title="Usuń wydatek">
+									<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+									</svg>
+									<span class="hidden sm:inline">Usuń</span>
+								</button>
 							</td>
 						</tr>
 					{% else %}
@@ -173,4 +182,99 @@
 			</table>
 		</div>
 	</div>
+
+	{# Delete Confirmation Modal #}
+	<div id="deleteModal"
+	     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300"
+	     role="dialog"
+	     aria-modal="true"
+	     aria-labelledby="deleteModalTitle"
+	     aria-describedby="deleteModalDescription">
+
+	    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl transform transition-all duration-300 scale-95 modal-content"
+	         role="document">
+
+	        <div class="flex items-center justify-between mb-4">
+	            <h2 id="deleteModalTitle" class="text-2xl font-bold text-red-600">
+	                Usuń wydatek
+	            </h2>
+	            <button type="button"
+	                    onclick="hideDeleteConfirm()"
+	                    class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+	                    aria-label="Zamknij okno dialogowe">
+	                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+	                </svg>
+	            </button>
+	        </div>
+
+	        <div id="deleteModalDescription" class="mb-6">
+	            <p class="text-lg mb-4 text-gray-700">
+	                Czy na pewno chcesz usunąć ten wydatek?
+	            </p>
+
+	            <div class="recurring-warning bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4 hidden"
+	                 role="alert"
+	                 aria-live="polite">
+	                <div class="flex items-start">
+	                    <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+	                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+	                    </svg>
+	                    <div>
+	                        <strong>⚠️ Uwaga:</strong> To jest wydatek cykliczny.
+	                        Usunięcie tej wystąpienia nie wpłynie na inne wystąpienia.
+	                    </div>
+	                </div>
+	            </div>
+
+	            <div class="bg-gray-100 p-4 rounded-lg border border-gray-200">
+	                <div class="flex items-center mb-2">
+	                    <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+	                    </svg>
+	                    <p class="font-medium text-gray-800 expense-name">Nazwa wydatku</p>
+	                </div>
+	                <div class="grid grid-cols-2 gap-4 text-sm">
+	                    <div class="flex items-center">
+	                        <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+	                        </svg>
+	                        <span class="expense-amount text-gray-600">Kwota: 0.00 zł</span>
+	                    </div>
+	                    <div class="flex items-center">
+	                        <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+	                        </svg>
+	                        <span class="expense-date text-gray-600">Data: 01.01.2024</span>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="flex space-x-3 justify-end">
+	            <button type="button"
+	                    onclick="hideDeleteConfirm()"
+	                    class="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200">
+	                Anuluj
+	            </button>
+	            <button type="button"
+	                    onclick="confirmDelete()"
+	                    class="px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+	                    id="confirmDeleteBtn">
+	                <span class="flex items-center">
+	                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+	                    </svg>
+	                    Tak, usuń
+	                </span>
+	            </button>
+	        </div>
+	    </div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('expenses_index') }}
+	{{ encore_entry_script_tags('delete_modal') }}
 {% endblock %}
