@@ -1,10 +1,50 @@
-# Szczegółowe reguły kodowania - Symfony Expenses Manager
+r# Szczegółowe reguły kodowania - Symfony Expenses Manager
 
 ## Architektura aplikacji
 
 ### MVC Pattern z Service Layer
 ```
 Controller (HTTP) → Service (Logic) → Repository (Data) → Entity (Model)
+```
+
+### Model wystąpień wydatków (ExpenseOccurrence)
+
+Po refaktoryzacji z lutego 2026, **wszystkie wydatki są traktowane jako wystąpienia**:
+
+- **Wszystkie wydatki** (cykliczne i niecykliczne) mają odpowiadające im encje `ExpenseOccurrence`
+- **Wszystkie ID w UI** wskazują na `ExpenseOccurrence` (nie na `Expense`)
+- **Operacje edycji/usuwania** zawsze operują na wystąpieniach
+- **Dla wydatków niecyklicznych**: istnieje dokładnie jedno wystąpienie
+- **Dla wydatków cyklicznych**: istnieje wiele wystąpień (jedno na każdy okres)
+
+#### Przykład działania:
+```php
+// Dodanie wydatku (cyklicznego lub nie)
+$expense = new Expense();
+$expense->setName('Kawa');
+$expense->setRecurringFrequency(0); // Niecykliczny
+
+$occurrence = new ExpenseOccurrence();
+$occurrence->setExpense($expense);
+$occurrence->setOccurrenceDate(new \DateTime('2026-02-01'));
+// ID wystąpienia używany w UI: $occurrence->getId()
+```
+
+#### Operacje na wystąpieniach:
+- **Edycja**: Zawsze edytuje pojedyncze wystąpienie
+- **Usuwanie**: Usuwa wystąpienie, jeśli `Expense` nie ma więcej wystąpień → usuwa także `Expense`
+- **Status płatności**: Operuje tylko na wystąpieniu
+
+#### Przykład kontrolera:
+```php
+#[Route('/expenses/edit/{id}', name: 'expenses_edit')]
+public function edit(Request $request, int $id): Response
+{
+    // $id zawsze wskazuje na ExpenseOccurrence
+    $occurrence = $this->entityManager->find(ExpenseOccurrence::class, $id);
+    
+    // Logika edycji wystąpienia...
+}
 ```
 
 ### Przykład struktury kontrolera:

@@ -11,7 +11,7 @@
     </h1>
 
     <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
-        <strong>Wydatek:</strong> {{ occurrence.expense.name }}<br>
+        <strong>Wystąpienie wydatku:</strong> {{ occurrence.expense.name }}<br>
         <strong>Data wystąpienia:</strong> {{ occurrence.occurrenceDate|date('Y-m-d') }}<br>
         <strong>Kategoria:</strong> {{ occurrence.expense.category.name }}
     </div>
@@ -21,30 +21,186 @@
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
 
         <div>
-            <label for="amount" class="block text-lg font-semibold text-gray-800">Kwota:</label>
-            <input type="number" id="amount" name="amount" step="0.01" required
-                value="{{ occurrence.amount }}"
+            <label for="name" class="block text-lg font-semibold text-gray-800">Nazwa wydatku:</label>
+            <input type="text" id="name" name="name" required
+                value="{{ occurrence.expense.name }}"
                 class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+        </div>
+        <div class="flex space-x-4">
+            <div class="flex-1">
+                <label for="amount" class="block text-lg font-semibold text-gray-800">Kwota wystąpienia:</label>
+                <input type="number" id="amount" name="amount" step="0.01" required
+                    value="{{ occurrence.amount }}"
+                    class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+            </div>
+        </div>
+        <div>
+            <label for="date" class="block text-lg font-semibold text-gray-800">Data wystąpienia:</label>
+            <input type="date" id="date" name="date" required 
+                value="{{ occurrence.occurrenceDate|date('Y-m-d') }}"
+                class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+        </div>
+        <div>
+            <label for="category" class="block text-lg font-semibold text-gray-800">Kategoria:</label>
+            {% include 'components/select.html.twig' with {
+                id: 'category',
+                name: 'category',
+                required: true,
+                show_placeholder: false,
+                selected: occurrence.expense.category.id,
+                options: categoryOptions
+            } %}
+        </div>
+        <div>
+            <label for="recurringFrequency" class="block text-lg font-semibold text-gray-800">Cykl powtarzania:</label>
+            {% include 'components/select.html.twig' with {
+                id: 'recurringFrequency',
+                name: 'recurringFrequency',
+                selected: occurrence.expense.recurringFrequency,
+                options: {
+                    0: 'Nie powtarza się',
+                    1: 'Co 1 miesiąc',
+                    2: 'Co 2 miesiące',
+                    3: 'Co 3 miesiące',
+                    4: 'Co 4 miesiące',
+                    6: 'Co 6 miesięcy',
+                    12: 'Co 12 miesięcy'
+                }
+            } %}
+            <p class="text-sm text-gray-600 mt-1">Wydatki z cyklem > 0 będą automatycznie dodawane w następnych miesiącach.</p>
         </div>
 
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div class="flex items-center">
-                <input type="checkbox" id="apply_to_future" name="apply_to_future" value="1"
+                <input type="checkbox" id="apply_amount_to_future" name="apply_amount_to_future" value="1"
                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="apply_to_future" class="ml-2 block text-sm text-gray-900">
-                    <strong>Zastosuj do wszystkich wystąpień od tej daty wzwyż</strong>
+                <label for="apply_amount_to_future" class="ml-2 block text-sm text-gray-900">
+                    <strong>Zastosuj kwotę do wszystkich wystąpień od tej daty wzwyż</strong>
                 </label>
             </div>
             <p class="text-sm text-gray-600 mt-2">
-                Zaznaczenie tej opcji zaktualizuje kwotę domyślną wydatku oraz wszystkie przyszłe wystąpienia od {{ occurrence.occurrenceDate|date('Y-m-d') }}.
+                Zaznaczenie tej opcji zaktualizuje kwotę wszystkich przyszłych wystąpień od {{ occurrence.occurrenceDate|date('Y-m-d') }}.
             </p>
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-between">
+            <button type="button" 
+                class="px-6 py-3 bg-red-400 text-white font-bold text-lg rounded-lg hover:bg-red-800"
+                onclick="showDeleteConfirm({{ occurrence.id }}, '{{ occurrence.expense.name|e('js') }}', '{{ occurrence.amount|number_format(2, ',', ' ')|e('js') }}', '{{ occurrence.occurrenceDate|date('d.m.Y')|e('js') }}', '{{ occurrence.expense.isRecurring() ? 'true' : 'false' }}', '{{ isLastOccurrence ? 'true' : 'false' }}')">
+                Usuń wystąpienie
+            </button>
             <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-800">
                 Zaktualizuj wystąpienie
             </button>
         </div>
     </form>
 </div>
+
+{# Delete Confirmation Modal #}
+<div id="deleteModal"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="deleteModalTitle"
+     aria-describedby="deleteModalDescription">
+
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl transform transition-all duration-300 scale-95 modal-content"
+         role="document">
+
+        <div class="flex items-center justify-between mb-4">
+            <h2 id="deleteModalTitle" class="text-2xl font-bold text-red-600">
+                Usuń wydatek
+            </h2>
+            <button type="button"
+                    onclick="hideDeleteConfirm()"
+                    class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    aria-label="Zamknij okno dialogowe">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="deleteModalDescription" class="mb-6">
+            <p class="text-lg mb-4 text-gray-700">
+                Czy na pewno chcesz usunąć ten wydatek?
+            </p>
+
+            <div class="recurring-warning bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4 hidden"
+                 role="alert"
+                 aria-live="polite">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <strong>⚠️ Uwaga:</strong> To jest wydatek cykliczny.
+                        Usunięcie tego wystąpienia nie wpłynie na inne wystąpienia.
+                    </div>
+                </div>
+            </div>
+
+            <div class="last-occurrence-warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden"
+                 role="alert"
+                 aria-live="polite">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <strong>⚠️ Ostrzeżenie:</strong> To jest ostatnie wystąpienie tego wydatku.
+                        Usunięcie tego wystąpienia spowoduje usunięcie całego wydatku!
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="font-medium text-gray-800 expense-name">Nazwa wydatku</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                        </svg>
+                        <span class="expense-amount text-gray-600">Kwota: 0.00 zł</span>
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="expense-date text-gray-600">Data: 01.01.2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-3 justify-end">
+            <button type="button"
+                    onclick="hideDeleteConfirm()"
+                    class="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200">
+                Anuluj
+            </button>
+            <button type="button"
+                    onclick="confirmDelete()"
+                    class="px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                    id="confirmDeleteBtn">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Tak, usuń
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{{ encore_entry_script_tags('delete_modal') }}
 {% endblock %}

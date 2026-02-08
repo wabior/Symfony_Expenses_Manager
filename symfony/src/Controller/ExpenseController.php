@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\MenuRepository;
 use App\Service\ExpenseService;
 use App\Entity\ExpenseOccurrence;
+use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +51,17 @@ class ExpenseController extends BaseController
         $monthInt = $month !== null ? (int) $month : null;
 
         $expenses = $this->expenseService->getExpenseOccurrencesByMonth($yearInt, $monthInt);
+        
+        // Dodaj informacje o liczbie wystąpień dla każdego wydatku
+        $expenseCounts = [];
+        foreach ($expenses as $occurrence) {
+            $expenseId = $occurrence->getExpense()->getId();
+            if (!isset($expenseCounts[$expenseId])) {
+                $expenseCounts[$expenseId] = $this->entityManager->getRepository(ExpenseOccurrence::class)
+                    ->count(['expense' => $occurrence->getExpense()]);
+            }
+            $occurrence->occurrenceCount = $expenseCounts[$expenseId];
+        }
         $categories = $this->expenseService->getAllCategories();
         $navigation = $this->expenseService->getNavigationMonths($yearInt, $monthInt);
 
@@ -172,26 +184,53 @@ class ExpenseController extends BaseController
             try {
                 $data = $request->request->all();
                 $newAmount = $data['amount'] ?? $occurrence->getAmount();
-                $applyToFuture = isset($data['apply_to_future']);
+                $newName = $data['name'] ?? $occurrence->getExpense()->getName();
+                $newCategoryId = $data['category'] ?? $occurrence->getExpense()->getCategory()->getId();
+                $newRecurringFrequency = (int)($data['recurringFrequency'] ?? $occurrence->getExpense()->getRecurringFrequency());
+                $newDate = new \DateTime($data['date'] ?? $occurrence->getOccurrenceDate()->format('Y-m-d'));
+                
+                $applyAmountToFuture = isset($data['apply_amount_to_future']);
 
+                $expense = $occurrence->getExpense();
+                
+                // Zawsze aktualizuj właściwości wydatku (dotyczą wszystkich wystąpień)
+                $expense->setName($newName);
+                $category = $this->entityManager->find(Category::class, $newCategoryId);
+                if (!$category) {
+                    throw new \Exception('Category not found');
+                }
+                $expense->setCategory($category);
+                $expense->setRecurringFrequency($newRecurringFrequency);
+                
+                // Aktualizuj wystąpienie
                 $occurrence->setAmount($newAmount);
+                $occurrence->setOccurrenceDate($newDate);
 
-                if ($applyToFuture) {
-                    // Zaktualizuj kwotę domyślną w Expense i wszystkie wystąpienia od tej daty
-                    $expense = $occurrence->getExpense();
+                // Jeśli zastosować kwotę do przyszłych wystąpień
+                if ($applyAmountToFuture) {
                     $expense->setAmount($newAmount);
                     $this->expenseService->updateOccurrencesFromDate($expense, $occurrence->getOccurrenceDate(), $newAmount);
                 }
 
                 $this->entityManager->flush();
-                $this->addFlash('success', 'Occurrence updated successfully');
+                $this->addFlash('success', 'Wystąpienie zostało pomyślnie zaktualizowane');
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Occurrence update failed: ' . $e->getMessage());
+                $this->addFlash('error', 'Aktualizacja wystąpienia nie powiodła się: ' . $e->getMessage());
             }
         }
 
+        $categories = $this->expenseService->getAllCategories();
+        $categoryOptions = $this->expenseService->getCategoriesForSelect();
+
+        // Sprawdź liczbę wystąpień dla tego wydatku
+        $occurrenceCount = $this->entityManager->getRepository(ExpenseOccurrence::class)
+            ->count(['expense' => $occurrence->getExpense()]);
+
         return $this->renderWithRoutes('expenses/edit_occurrence.html.twig', [
             'occurrence' => $occurrence,
+            'categories' => $categories,
+            'categoryOptions' => $categoryOptions,
+            'isLastOccurrence' => $occurrenceCount === 1,
         ]);
     }
 

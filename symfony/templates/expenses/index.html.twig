@@ -154,7 +154,7 @@
 							</td>
 							<td class="table-cell text-center">
 								<button type="button"
-									onclick="showDeleteConfirm('{{ itemId }}', '{{ expense.name|e('js') }}', '{{ occurrence.amount|number_format(2, ',', ' ')|e('js') }}', '{{ occurrence.occurrenceDate|date('d.m.Y')|e('js') }}', '{{ expense.isRecurring() ? 'true' : 'false' }}')"
+									onclick="showDeleteConfirm('{{ itemId }}', '{{ expense.name|e('js') }}', '{{ occurrence.amount|number_format(2, ',', ' ')|e('js') }}', '{{ occurrence.occurrenceDate|date('d.m.Y')|e('js') }}', '{{ expense.isRecurring() ? 'true' : 'false' }}', '{{ occurrence.occurrenceCount == 1 ? 'true' : 'false' }}')"
 									class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
 									aria-label="Usuń wydatek: {{ expense.name }} z dnia {{ occurrence.occurrenceDate|date('d.m.Y') }}"
 									title="Usuń wydatek">
@@ -223,6 +223,20 @@
 	                    <div>
 	                        <strong>⚠️ Uwaga:</strong> To jest wydatek cykliczny.
 	                        Usunięcie tej wystąpienia nie wpłynie na inne wystąpienia.
+	                    </div>
+	                </div>
+	            </div>
+
+	            <div class="last-occurrence-warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden"
+	                 role="alert"
+	                 aria-live="polite">
+	                <div class="flex items-start">
+	                    <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+	                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+	                    </svg>
+	                    <div>
+	                        <strong>⚠️ Ostrzeżenie:</strong> To jest ostatnie wystąpienie tego wydatku.
+	                        Usunięcie tego wystąpienia spowoduje usunięcie całego wydatku!
 	                    </div>
 	                </div>
 	            </div>

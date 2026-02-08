@@ -147,6 +147,7 @@ class ExpenseService extends BaseUserService
 
         // Usuń wystąpienie
         $this->entityManager->remove($occurrence);
+        $this->entityManager->flush(); // Flush po usunięciu wystąpienia
 
         // Sprawdź czy wydatek ma jeszcze jakieś wystąpienia
         $remainingOccurrences = $this->entityManager->getRepository(ExpenseOccurrence::class)

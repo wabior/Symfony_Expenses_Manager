@@ -2,29 +2,29 @@
   "entrypoints": {
     "app": {
       "js": [
-        "/build/runtime.js",
-        "/build/app.js"
+        "/build/runtime.e702e4f2.js",
+        "/build/app.53d71f57.js"
       ],
       "css": [
-        "/build/app.css"
+        "/build/app.f46f5419.css"
       ]
     },
     "payment_status": {
       "js": [
-        "/build/runtime.js",
-        "/build/payment_status.js"
+        "/build/runtime.e702e4f2.js",
+        "/build/payment_status.21d25d43.js"
       ]
     },
     "expenses_index": {
       "js": [
-        "/build/runtime.js",
-        "/build/expenses_index.js"
+        "/build/runtime.e702e4f2.js",
+        "/build/expenses_index.f3d25675.js"
       ]
     },
     "delete_modal": {
       "js": [
-        "/build/runtime.js",
-        "/build/delete_modal.js"
+        "/build/runtime.e702e4f2.js",
+        "/build/delete_modal.fbac9784.js"
       ]
     }
   }

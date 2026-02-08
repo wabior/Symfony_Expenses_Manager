@@ -13,6 +13,7 @@ function updateModalContent() {
     const amountEl = document.querySelector('#deleteModal .expense-amount');
     const dateEl = document.querySelector('#deleteModal .expense-date');
     const recurringWarning = document.querySelector('#deleteModal .recurring-warning');
+    const lastOccurrenceWarning = document.querySelector('#deleteModal .last-occurrence-warning');
 
     if (expenseNameEl) {
         expenseNameEl.textContent = deleteExpenseData.name;
@@ -31,10 +32,18 @@ function updateModalContent() {
             recurringWarning.classList.add('hidden');
         }
     }
+
+    if (lastOccurrenceWarning) {
+        if (deleteExpenseData.isLastOccurrence === 'true') {
+            lastOccurrenceWarning.classList.remove('hidden');
+        } else {
+            lastOccurrenceWarning.classList.add('hidden');
+        }
+    }
 }
 
 // Global functions for onclick handlers
-window.showDeleteConfirm = function (occurrenceId, expenseName, amount, date, isRecurring) {
+window.showDeleteConfirm = function (occurrenceId, expenseName, amount, date, isRecurring, isLastOccurrence) {
     // Store previous focus for accessibility
     previousFocusElement = document.activeElement;
 
@@ -43,7 +52,8 @@ window.showDeleteConfirm = function (occurrenceId, expenseName, amount, date, is
         name: expenseName,
         amount,
         date,
-        isRecurring
+        isRecurring,
+        isLastOccurrence
     };
 
     // Update modal content dynamically
@@ -153,14 +163,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle modal click outside
     const modal = document.getElementById('deleteModal');
     if (modal) {
-        modal.addEventListener('click', function (e) {
+        modal.addEventListener('click', (e) => {
             if (e.target === this) {
                 window.hideDeleteConfirm();
             }
         });
 
         // Focus trap for accessibility
-        modal.addEventListener('keydown', function (e) {
+        modal.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 const focusableElements = modal.querySelectorAll(
                     'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -188,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle Enter key on confirm button (redundant but good UX)
     const confirmBtn = document.getElementById('confirmDeleteBtn');
     if (confirmBtn) {
-        confirmBtn.addEventListener('keydown', function (e) {
+        confirmBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !this.disabled) {
                 window.confirmDelete();
             }
@@ -199,8 +209,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // Export functions for potential module usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        showDeleteConfirm,
-        hideDeleteConfirm,
-        confirmDelete
+        updateModalContent
     };
 }
