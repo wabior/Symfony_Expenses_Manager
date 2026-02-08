@@ -1,11 +1,11 @@
 "use strict";
 (self["webpackChunk"] = self["webpackChunk"] || []).push([["app"],{
 
-/***/ "./assets/app.js"
+/***/ "./assets/app.js":
 /*!***********************!*\
   !*** ./assets/app.js ***!
   \***********************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_app_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./styles/app.css */ "./assets/styles/app.css");
@@ -19,19 +19,19 @@ __webpack_require__.r(__webpack_exports__);
 // any CSS you import will output into a single css file (app.css in this case)
 
 
-/***/ },
+/***/ }),
 
-/***/ "./assets/styles/app.css"
+/***/ "./assets/styles/app.css":
 /*!*******************************!*\
   !*** ./assets/styles/app.css ***!
   \*******************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
 
-/***/ }
+/***/ })
 
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules

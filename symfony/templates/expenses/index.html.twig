@@ -57,7 +57,7 @@
 			<table class="min-w-full leading-normal">
 				<thead>
 					<tr>
-						{% set headers = ['Data', 'Nazwa', 'Kwota', 'Kategoria', 'Cykliczność', 'Status'] %}
+						{% set headers = ['Data', 'Nazwa', 'Kwota', 'Kategoria', 'Cykliczność', 'Status', 'Akcje'] %}
 						{% for header in headers %}
 							<th class="table-header">{{ header }}</th>
 						{% endfor %}
@@ -145,6 +145,16 @@
 									{% endfor %}
 								</select>
 							</td>
+							<td class="table-cell text-center">
+								<form action="{{ path('expenses_delete', {id: itemId}) }}" method="post" class="inline-block" onsubmit="return confirm('Czy na pewno chcesz usunąć ten wydatek?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ itemId) }}">
+									<button type="submit" class="text-gray-500 hover:text-red-600 p-2 rounded-lg transition-colors duration-200" title="Usuń wydatek">
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+										</svg>
+									</button>
+								</form>
+							</td>
 						</tr>
 					{% else %}
 						<tr>
@@ -163,9 +173,4 @@
 			</table>
 		</div>
 	</div>
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('expenses_index') }}
 {% endblock %}

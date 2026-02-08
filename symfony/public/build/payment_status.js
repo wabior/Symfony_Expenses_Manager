@@ -1,10 +1,10 @@
 (self["webpackChunk"] = self["webpackChunk"] || []).push([["payment_status"],{
 
-/***/ "./assets/js/payment_status.js"
+/***/ "./assets/js/payment_status.js":
 /*!*************************************!*\
   !*** ./assets/js/payment_status.js ***!
   \*************************************/
-() {
+/***/ (() => {
 
 var initPaymentStatus = function initPaymentStatus() {
   var paymentStatusSelect = document.getElementById('paymentStatus');
@@ -29,7 +29,7 @@ var initPaymentStatus = function initPaymentStatus() {
 };
 document.addEventListener('DOMContentLoaded', initPaymentStatus);
 
-/***/ }
+/***/ })
 
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
