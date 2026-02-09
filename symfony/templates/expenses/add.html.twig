@@ -11,10 +11,11 @@
     </h1>
         <form action="{{ path(expense is defined ? 'expenses_edit' : 'expenses_add', expense is defined ? {id: expense.id} : {}) }}"
             method="post" class="space-y-6 bg-white/25 p-8 shadow-xl rounded-lg">
+
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
-              <div>
-                <label for="category" class="block text-lg font-semibold text-gray-800">Kategoria:</label>
+            <div>
                 {% include 'components/select.html.twig' with {
+                    label: 'Kategoria:',
                     id: 'category',
                     name: 'category',
                     required: true,
@@ -24,22 +25,32 @@
                 } %}
             </div>
             <div>
-                <label for="name" class="block text-lg font-semibold text-gray-800">Nazwa wydatku:</label>
-                <input type="text" id="name" name="name" required
-                    value="{{ expense.name ?? '' }}"
-                    class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+                {% include 'components/input.html.twig' with {
+                    label: 'Nazwa wydatku:',
+                    type: 'text',
+                    id: 'name',
+                    name: 'name',
+                    required: true,
+                    value: expense.name ?? ''
+                } %}
             </div>
             <div class="flex space-x-4">
                 <div class="flex-1">
-                    <label for="amount" class="block text-lg font-semibold text-gray-800">Kwota:</label>
-                    <input type="number" id="amount" name="amount" step="0.01" required
-                        value="{{ expense.amount ?? '' }}"
-                        class="h-14 mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+                    {% include 'components/input.html.twig' with {
+                        label: 'Kwota:',
+                        type: 'number',
+                        id: 'amount',
+                        name: 'amount',
+                        required: true,
+                        step: '0.01',
+                        value: expense.amount ?? '',
+                        class: 'h-14'
+                    } %}
                 </div>
                 {% if expense is not defined %}
                 <div class="flex-1">
-                    <label for="paymentStatus" class="block text-lg font-semibold text-gray-800">Status płatności:</label>
                     {% include 'components/select.html.twig' with {
+                        label: 'Status płatności:',
                         id: 'paymentStatus',
                         name: 'paymentStatus',
                         required: true,
@@ -54,14 +65,18 @@
                 {% endif %}
             </div>
             <div>
-                <label for="date" class="block text-lg font-semibold text-gray-800">Data:</label>
-                <input type="date" id="date" name="date" required 
-                    value="{{ expense is defined and expense.date ? expense.date|date('Y-m-d') : "now"|date("Y-m-d") }}"
-                    class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+                {% include 'components/input.html.twig' with {
+                    label: 'Data:',
+                    type: 'date',
+                    id: 'date',
+                    name: 'date',
+                    required: true,
+                    value: expense is defined and expense.date ? expense.date|date('Y-m-d') : "now"|date("Y-m-d")
+                } %}
             </div>
             <div>
-                <label for="recurringFrequency" class="block text-lg font-semibold text-gray-800">Cykl powtarzania:</label>
                 {% include 'components/select.html.twig' with {
+                    label: 'Cykl powtarzania:',
                     id: 'recurringFrequency',
                     name: 'recurringFrequency',
                     selected: expense.recurringFrequency ?? 0,
@@ -79,10 +94,13 @@
             </div>
             {% if expense is not defined %}
             <div>
-                <label for="paymentDate" class="block text-lg font-semibold text-gray-800">Data płatności:</label>
-                <input type="date" id="paymentDate" name="paymentDate"
-                    value="{{ expense is defined and expense.paymentDate ? expense.paymentDate|date('Y-m-d') : '' }}"
-                    class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
+                {% include 'components/input.html.twig' with {
+                    label: 'Data płatności:',
+                    type: 'date',
+                    id: 'paymentDate',
+                    name: 'paymentDate',
+                    value: expense is defined and expense.paymentDate ? expense.paymentDate|date('Y-m-d') : ''
+                } %}
             </div>
             {% endif %}
             <div class="flex justify-between">

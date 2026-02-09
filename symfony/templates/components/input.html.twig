@@ -1,0 +1,12 @@
+{# Komponent input dla różnych typów #}
+{% if label is defined %}
+<label for="{{ id|default('input') }}" class="block text-lg font-semibold text-gray-800">{{ label }}</label>
+{% endif %}
+<input type="{{ type|default('text') }}"
+    id="{{ id|default('input') }}"
+    name="{{ name|default(id|default('input')) }}"
+    {% if required is defined and required %}required{% endif %}
+    {% if step is defined %}step="{{ step }}"{% endif %}
+    {% if value is defined %}value="{{ value }}"{% endif %}
+    {% if placeholder is defined %}placeholder="{{ placeholder }}"{% endif %}
+    class="{{ class|default('') }} mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100 focus:border-blue-500 focus:outline-none transition-all duration-300">
