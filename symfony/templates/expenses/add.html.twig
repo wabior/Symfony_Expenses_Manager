@@ -12,6 +12,17 @@
         <form action="{{ path(expense is defined ? 'expenses_edit' : 'expenses_add', expense is defined ? {id: expense.id} : {}) }}"
             method="post" class="space-y-6 bg-white/25 p-8 shadow-xl rounded-lg">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
+              <div>
+                <label for="category" class="block text-lg font-semibold text-gray-800">Kategoria:</label>
+                {% include 'components/select.html.twig' with {
+                    id: 'category',
+                    name: 'category',
+                    required: true,
+                    show_placeholder: false,
+                    selected: categories|first.getId(),
+                    options: categoryOptions
+                } %}
+            </div>
             <div>
                 <label for="name" class="block text-lg font-semibold text-gray-800">Nazwa wydatku:</label>
                 <input type="text" id="name" name="name" required
@@ -47,17 +58,6 @@
                 <input type="date" id="date" name="date" required 
                     value="{{ expense is defined and expense.date ? expense.date|date('Y-m-d') : "now"|date("Y-m-d") }}"
                     class="mt-2 block w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-lg bg-gray-100">
-            </div>
-            <div>
-                <label for="category" class="block text-lg font-semibold text-gray-800">Kategoria:</label>
-                {% include 'components/select.html.twig' with {
-                    id: 'category',
-                    name: 'category',
-                    required: true,
-                    show_placeholder: false,
-                    selected: categories|first.getId(),
-                    options: categoryOptions
-                } %}
             </div>
             <div>
                 <label for="recurringFrequency" class="block text-lg font-semibold text-gray-800">Cykl powtarzania:</label>

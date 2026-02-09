@@ -24,12 +24,12 @@
                                 </svg>
                                 Zobacz wydatki
                             </a>
-                            <a href="{{ path('expenses_add') }}" class="btn-secondary text-lg px-8 py-4">
-                                <svg class="w-6 h-6 mr-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Dodaj wydatek
-                            </a>
+                            {% include 'components/button.html.twig' with {
+                                href: path('expenses_add'),
+                                text: 'Dodaj wydatek',
+                                class: 'btn-secondary text-lg px-8 py-4',
+                                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>'
+                            } %}
                         {% else %}
                             <a href="{{ path('category_add') }}" class="btn-primary text-lg px-8 py-4">
                                 <svg class="w-6 h-6 mr-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">

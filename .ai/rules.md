@@ -36,7 +36,7 @@ $occurrence->setOccurrenceDate(new \DateTime('2026-02-01'));
 - **Status płatności**: Operuje tylko na wystąpieniu
 
 #### Przykład kontrolera:
-```php
+```phpc
 #[Route('/expenses/edit/{id}', name: 'expenses_edit')]
 public function edit(Request $request, int $id): Response
 {
