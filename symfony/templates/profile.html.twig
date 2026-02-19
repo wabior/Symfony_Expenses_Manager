@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto mt-8">
+        <h1 class="text-2xl font-bold text-gray-900 my-8">Profil użytkownika</h1>
+
+        <div class="bg-white p-8 shadow-xl rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800">Email:</label>
+                    <p class="mt-2 text-gray-600">{{ user.email }}</p>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800">Data rejestracji:</label>
+                    <p class="mt-2 text-gray-600">{{ user.createdAt|date('d.m.Y H:i') }}</p>
+                </div>
+            </div>
+
+            <div class="mt-8 border-t pt-8">
+                <h2 class="text-xl font-bold text-red-600 mb-4">Strefa niebezpieczna</h2>
+                <p class="text-gray-600 mb-6">Usunięcie konta jest nieodwracalne. Wszystkie Twoje dane zostaną trwale usunięte.</p>
+                <button onclick="showAccountDeleteConfirm()"
+                        class="px-6 py-3 bg-red-600 text-white font-bold text-lg rounded-lg hover:bg-red-800 focus:outline-none focus:shadow-outline">
+                    Usuń konto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {# Account Delete Confirmation Modal #}
+    <div id="accountDeleteModal"
+         class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="accountDeleteModalTitle"
+         aria-describedby="accountDeleteModalDescription">
+
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl transform transition-all duration-300 scale-95 modal-content"
+             role="document">
+
+            <div class="flex items-center justify-between mb-4">
+                <h2 id="accountDeleteModalTitle" class="text-2xl font-bold text-red-600">
+                    Usuń konto
+                </h2>
+                <button type="button"
+                        onclick="hideAccountDeleteConfirm()"
+                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                        aria-label="Zamknij okno dialogowe">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="accountDeleteModalDescription" class="mb-6">
+                <p class="text-lg mb-4 text-gray-700">
+                    Czy na pewno chcesz usunąć konto?
+                </p>
+                <p class="text-red-600 font-semibold mb-4">
+                    To działanie jest nieodwracalne i spowoduje usunięcie wszystkich Twoich danych, w tym wydatków i kategorii.
+                </p>
+
+                <div class="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <p class="font-medium text-gray-800">{{ user.email }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 justify-end">
+                <button type="button"
+                        onclick="hideAccountDeleteConfirm()"
+                        class="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-200">
+                    Anuluj
+                </button>
+                <button type="button"
+                        onclick="confirmDeleteAccount()"
+                        class="px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                        id="confirmDeleteAccountBtn">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Tak, usuń konto
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteAccountForm" action="{{ path('profile_delete') }}" method="post" style="display: none;">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('delete_account') }}">
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function showAccountDeleteConfirm() {
+            const modal = document.getElementById('accountDeleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideAccountDeleteConfirm() {
+            const modal = document.getElementById('accountDeleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmDeleteAccount() {
+            document.getElementById('deleteAccountForm').submit();
+        }
+    </script>
+{% endblock %}

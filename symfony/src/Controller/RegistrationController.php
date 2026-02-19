@@ -34,7 +34,7 @@ class RegistrationController extends BaseController
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
         CsrfTokenManagerInterface $csrfTokenManager,
-        #[Autowire(service: 'monolog.logger.registration')] LoggerInterface $registrationLogger
+        #[Autowire(service: 'monolog.logger.user')] LoggerInterface $registrationLogger
     ): Response {
         // Redirect logged-in users
         if ($this->getUser()) {
@@ -45,6 +45,7 @@ class RegistrationController extends BaseController
         $email = '';
         $password = '';
         $confirmPassword = '';
+        $acceptTerms = false;
 
         if ($request->isMethod('POST')) {
             $registrationLogger->info('[REGISTRATION] POST request received', [
@@ -66,6 +67,7 @@ class RegistrationController extends BaseController
             $email = $request->request->get('email', '');
             $password = $request->request->get('password', '');
             $confirmPassword = $request->request->get('confirm_password', '');
+            $acceptTerms = $request->request->get('accept_terms', false);
 
             $registrationLogger->info('[REGISTRATION] Form data received', [
                 'email' => $email,
@@ -114,6 +116,14 @@ class RegistrationController extends BaseController
                 $registrationLogger->info('[REGISTRATION] Password confirmation validation passed');
             }
 
+            // Validate terms acceptance
+            if (!$acceptTerms) {
+                $registrationLogger->warning('[REGISTRATION] Terms acceptance validation failed: not accepted');
+                $errors['accept_terms'] = 'Musisz zaakceptować regulamin i zasady prywatności.';
+            } else {
+                $registrationLogger->info('[REGISTRATION] Terms acceptance validation passed');
+            }
+
             $registrationLogger->info('[REGISTRATION] Validation completed', [
                 'error_count' => count($errors),
             ]);
@@ -125,6 +135,7 @@ class RegistrationController extends BaseController
                 ]);
                 $user = new User();
                 $user->setEmail($email);
+                $user->setCreatedAt(new \DateTimeImmutable());
                 // Zapisujemy pustą tablicę ról - w encji i tak zawsze zostanie dodane ROLE_USER,
                 // ale w bazie nie będzie problemu z NOT NULL na kolumnie JSON.
                 $user->setRoles([]);
@@ -168,6 +179,32 @@ class RegistrationController extends BaseController
         return $this->renderWithRoutes('security/register.html.twig', [
             'errors' => $errors,
             'email' => $email,
+            'accept_terms' => $acceptTerms,
+        ]);
+    }
+
+    #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
+    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('home');
+        }
+
+        // Clear session if account deletion flash is present
+        $flashBag = $request->getSession()->getFlashBag();
+        $flashes = $flashBag->peekAll();
+        if (isset($flashes['success']) && in_array('Konto zostało usunięte.', $flashes['success'])) {
+            $request->getSession()->invalidate();
+        }
+
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->renderWithRoutes('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
         ]);
     }
 }

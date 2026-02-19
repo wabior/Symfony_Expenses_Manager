@@ -47,4 +47,9 @@ class RouteController extends BaseController
         return $this->renderWithRoutes('about.html.twig');
     }
 
+    #[Route('/rodo', name: 'rodo', options: ['friendly_name' => 'RODO', 'order' => 5])]
+    public function contact(): Response
+    {
+        return $this->renderWithRoutes('rodo.html.twig');
+    }
 }

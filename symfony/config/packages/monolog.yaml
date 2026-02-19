@@ -1,5 +1,5 @@
 monolog:
-    channels: ['registration']
+    channels: ['user']
     handlers:
         main:
             type: stream

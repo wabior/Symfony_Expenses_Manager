@@ -1,0 +1,10 @@
+{% include 'components/confirmation_modal.html.twig' with {
+    modal_id: 'accountDeleteModal',
+    title: 'Usuń konto',
+    description: 'Czy na pewno chcesz usunąć konto? To działanie jest nieodwracalne i spowoduje usunięcie wszystkich Twoich danych.',
+    item_name: 'Konto: ' ~ user.email,
+    item_amount: '',
+    item_date: '',
+    confirm_action: 'confirmDeleteAccount()',
+    cancel_action: 'hideAccountDeleteConfirm()'
+} %}

@@ -10,12 +10,6 @@
         Edytuj wystąpienie wydatku
     </h1>
 
-    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6">
-        <strong>Wystąpienie wydatku:</strong> {{ occurrence.expense.name }}<br>
-        <strong>Data wystąpienia:</strong> {{ occurrence.occurrenceDate|date('Y-m-d') }}<br>
-        <strong>Kategoria:</strong> {{ occurrence.expense.category.name }}
-    </div>
-
     <form action="{{ path('expenses_edit', {id: occurrence.id}) }}"
         method="post" class="space-y-6 bg-white/25 p-8 shadow-xl rounded-lg">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">

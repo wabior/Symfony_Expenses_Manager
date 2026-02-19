@@ -21,7 +21,7 @@
 
     {% for type, messages in app.flashes %}
         {% for message in messages %}
-            <div class="container mx-auto alert alert-{{ type }} bg-{{ type == 'success' ? 'green' : 'red' }}-100 border border-{{ type == 'success' ? 'green' : 'red' }}-400 text-{{ type == 'success' ? 'green' : 'red' }}-700 px-4 py-3 rounded mb-4">
+            <div class="container mx-auto bg-{{ type == 'success' ? 'green' : 'red' }}-100 border border-{{ type == 'success' ? 'green' : 'red' }}-400 text-{{ type == 'success' ? 'green' : 'red' }}-700 px-4 py-3 rounded mb-4">
                 {{ message }}
             </div>
         {% endfor %}
@@ -51,6 +51,7 @@
                         <li><a href="{{ path('home') }}" class="text-gray-300 hover:text-white transition-colors">Strona główna</a></li>
                         <li><a href="{{ path('expenses') }}" class="text-gray-300 hover:text-white transition-colors">Wydatki</a></li>
                         <li><a href="{{ path('categories') }}" class="text-gray-300 hover:text-white transition-colors">Kategorie</a></li>
+                        <li><a href="{{ path('rodo') }}" class="text-gray-300 hover:text-white transition-colors">RODO</a></li>
                     </ul>
                 </div>
                 <div>
