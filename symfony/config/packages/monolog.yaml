@@ -18,8 +18,8 @@ when@prod:
                 type: stream
                 path: '%kernel.logs_dir%/%kernel.environment%.log'
                 level: info
-            registration:
+            user:
                 type: stream
-                path: '%kernel.logs_dir%/registration.log'
+                path: '%kernel.logs_dir%/user.log'
                 level: debug
-                channels: ['registration']
+                channels: ['user']
